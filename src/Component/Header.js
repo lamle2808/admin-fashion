@@ -43,14 +43,45 @@ function Header({ show, setShow, text }) {
     setAnchorEl(null);
   };
   return (
-    <StackHeader direction="row" color={"text.primary"} spacing={2}>
-      <IconButton onClick={() => setShow(!show)}>
+    <StackHeader 
+      direction="row" 
+      color={"text.primary"} 
+      spacing={2}
+      sx={{
+        px: 3,
+        py: 1.5,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        alignItems: 'center',
+        borderBottom: '1px solid #e0e0e0',
+        height: 64
+      }}
+    >
+      <IconButton onClick={() => setShow(!show)} sx={{ mr: 1 }}>
         <MenuIcon />
       </IconButton>
-      <Typography variant="h5">{text}</Typography>
-      <Search>
+
+      <Typography 
+        variant="h5" 
+        sx={{ 
+          fontWeight: 500, 
+          flexGrow: 0, 
+          mr: 3,
+          whiteSpace: 'nowrap'
+        }}
+      >
+        {text}
+      </Typography>
+
+      <Search sx={{ flexGrow: 1, maxWidth: 500 }}>
         <InputBase
-          sx={{ ml: 2, width: "90%", fontSize: 22 }}
+          sx={{ 
+            ml: 2, 
+            width: '90%', 
+            fontSize: 16,
+            '& input': {
+              py: 1
+            }
+          }}
           fullWidth
           placeholder="Tìm kiếm..."
           startAdornment={
@@ -60,18 +91,21 @@ function Header({ show, setShow, text }) {
           }
         />
       </Search>
-      <Stack direction="row" sx={{ paddingRight: 10 }}>
-        <IconButton>
+
+      <Stack 
+        direction="row" 
+        spacing={1}
+        alignItems="center"
+      >
+        <IconButton size="medium">
           <NotificationsIcon />
         </IconButton>
-        <Box
-          sx={{ display: "flex", alignItems: "center", textAlign: "center" }}
-        >
+
+        <Box>
           <Tooltip title="Tài khoản">
             <IconButton
               onClick={handleClick}
               size="small"
-              sx={{ ml: 2 }}
               aria-controls={open ? "account-menu" : undefined}
               aria-haspopup="true"
               aria-expanded={open ? "true" : undefined}
@@ -83,7 +117,9 @@ function Header({ show, setShow, text }) {
                   sx={{ width: 32, height: 32 }}
                 />
               ) : (
-                <Avatar>V</Avatar>
+                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+                  {data?.name?.charAt(0) || "A"}
+                </Avatar>
               )}
             </IconButton>
           </Tooltip>

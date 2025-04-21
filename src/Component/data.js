@@ -24,6 +24,14 @@ export const Phanloai = (id) => {
       return dataVGA;
     case 12:
       return dataMain;
+    case 13:
+      return dataClothes;
+    case 14:
+      return dataShirt;
+    case 15:
+      return dataPants;
+    case 16:
+      return dataDress;
     default:
       return "";
   }
@@ -316,4 +324,54 @@ export const dataMain = [
   },
   { specificationName: "Kích thước", specificationValue: "" },
   { specificationName: "Hệ điều hành", specificationValue: "" },
+];
+
+export const dataClothes = [
+  { specificationName: "Chất liệu", specificationValue: "" },
+  { specificationName: "Màu sắc", specificationValue: "" },
+  { specificationName: "Kích thước", specificationValue: "" },
+  { specificationName: "Phong cách", specificationValue: "" },
+  { specificationName: "Mùa phù hợp", specificationValue: "" },
+  { specificationName: "Xuất xứ", specificationValue: "" },
+  { specificationName: "Hướng dẫn bảo quản", specificationValue: "" },
+  { specificationName: "Chi tiết", specificationValue: "" },
+];
+
+export const dataShirt = [
+  { specificationName: "Chất liệu", specificationValue: "" },
+  { specificationName: "Màu sắc", specificationValue: "" },
+  { specificationName: "Kích thước", specificationValue: "" },
+  { specificationName: "Kiểu cổ áo", specificationValue: "" },
+  { specificationName: "Chiều dài tay", specificationValue: "" },
+  { specificationName: "Phong cách", specificationValue: "" },
+  { specificationName: "Mùa phù hợp", specificationValue: "" },
+  { specificationName: "Xuất xứ", specificationValue: "" },
+  { specificationName: "Hướng dẫn bảo quản", specificationValue: "" },
+  { specificationName: "Chi tiết", specificationValue: "" },
+];
+
+export const dataPants = [
+  { specificationName: "Chất liệu", specificationValue: "" },
+  { specificationName: "Màu sắc", specificationValue: "" },
+  { specificationName: "Kích thước", specificationValue: "" },
+  { specificationName: "Kiểu quần", specificationValue: "" },
+  { specificationName: "Chiều dài", specificationValue: "" },
+  { specificationName: "Phong cách", specificationValue: "" },
+  { specificationName: "Mùa phù hợp", specificationValue: "" },
+  { specificationName: "Xuất xứ", specificationValue: "" },
+  { specificationName: "Hướng dẫn bảo quản", specificationValue: "" },
+  { specificationName: "Chi tiết", specificationValue: "" },
+];
+
+export const dataDress = [
+  { specificationName: "Chất liệu", specificationValue: "" },
+  { specificationName: "Màu sắc", specificationValue: "" },
+  { specificationName: "Kích thước", specificationValue: "" },
+  { specificationName: "Kiểu váy", specificationValue: "" },
+  { specificationName: "Chiều dài", specificationValue: "" },
+  { specificationName: "Phong cách", specificationValue: "" },
+  { specificationName: "Mùa phù hợp", specificationValue: "" },
+  { specificationName: "Xuất xứ", specificationValue: "" },
+  { specificationName: "Hướng dẫn bảo quản", specificationValue: "" },
+  { specificationName: "Chi tiết", specificationValue: "" },
 ];

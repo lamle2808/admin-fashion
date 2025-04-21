@@ -101,14 +101,30 @@ function LeftAdmin() {
 
   return (
     <BoxSide>
-      <Box p={1} sx={{ width: 250 }}>
+      <Box 
+        sx={{ 
+          width: 250, 
+          p: 2, 
+          height: '100vh', 
+          overflowY: 'auto', 
+          boxShadow: '2px 0 8px rgba(0,0,0,0.1)'
+        }}
+      >
         <Box>
-          <List bgcolor="background.paper">
+          <List 
+            bgcolor="background.paper" 
+            sx={{ 
+              '& .MuiDivider-root': { 
+                my: 2 
+              } 
+            }}
+          >
             <Box
               sx={{
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                mb: 2
               }}
             >
               <Box
@@ -117,8 +133,6 @@ function LeftAdmin() {
                 sx={{
                   height: 60,
                   cursor: "pointer",
-
-                  marginTop: 2,
                 }}
                 alt="logo"
                 src={logo}

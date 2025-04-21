@@ -5,6 +5,9 @@ import {
   Stack,
   Tooltip,
   Typography,
+  Button,
+  Paper,
+  Alert,
 } from "@mui/material";
 import React from "react";
 import { useState } from "react";
@@ -14,6 +17,7 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import axios from "axios";
 import { useEffect } from "react";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import InventoryIcon from "@mui/icons-material/Inventory";
 import ModalProduct from "./ModalProduct";
 import { useNavigate } from "react-router-dom";
 
@@ -47,7 +51,7 @@ const Product = () => {
       headerName: "Tên",
       flex: 1,
     },
-    { field: "quantity", headerName: "Số lượng", flex: 0.5 },
+    { field: "quantity", headerName: "Tồn kho", flex: 0.5 },
     { field: "category", headerName: "Loại", flex: 0.5 },
     { field: "brand", headerName: "Thương hiệu", flex: 0.5 },
     {
@@ -74,10 +78,10 @@ const Product = () => {
       field: "actions",
       headerName: "Chức năng",
       type: "actions",
-      flex: 0.6,
+      flex: 0.8,
       getActions: (params) => {
         let actions = [
-          <Tooltip title="Sửa" placement="left">
+          <Tooltip title="Sửa thông tin" placement="left">
             <IconButton
               onClick={() => navigate(`/ProductEdit/${params.id}`)}
               color="primary"
@@ -85,6 +89,14 @@ const Product = () => {
               <DriveFileRenameOutlineIcon />
             </IconButton>
           </Tooltip>,
+          <Tooltip title="Nhập hàng" placement="left">
+            <IconButton
+              onClick={() => navigate("/ImportOrder")}
+              color="success"
+            >
+              <InventoryIcon />
+            </IconButton>
+          </Tooltip>
         ];
 
         return actions;
@@ -190,9 +202,29 @@ const Product = () => {
               paddingRight: 2,
             }}
           >
-            <Box sx={{ padding: "5px 5px 5px" }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: "5px 5px 15px" }}>
               <Typography variant="h4">Quản lý sản phẩm</Typography>
+              <Button 
+                variant="contained" 
+                color="success" 
+                startIcon={<InventoryIcon />}
+                onClick={() => navigate("/ImportOrder")}
+              >
+                Tạo phiếu nhập hàng
+              </Button>
             </Box>
+            
+            <Paper elevation={1} sx={{ p: 2, mb: 3, bgcolor: '#f8f9fa' }}>
+              <Alert severity="info" sx={{ mb: 1 }}>
+                <strong>Lưu ý về quản lý tồn kho:</strong> Số lượng tồn kho của sản phẩm được quản lý thông qua phiếu nhập hàng.
+              </Alert>
+              <Typography variant="body2">
+                1. Để chỉnh sửa thông tin cơ bản của sản phẩm (tên, mô tả, giá, thông số kỹ thuật), nhấn vào biểu tượng <DriveFileRenameOutlineIcon fontSize="small" sx={{ verticalAlign: 'middle' }} />.
+              </Typography>
+              <Typography variant="body2">
+                2. Để nhập thêm hàng hoặc cập nhật số lượng tồn kho của sản phẩm, nhấn vào biểu tượng <InventoryIcon fontSize="small" sx={{ verticalAlign: 'middle' }} /> hoặc nhấn nút "Tạo phiếu nhập hàng".
+              </Typography>
+            </Paper>
 
             {datatable()}
           </Box>

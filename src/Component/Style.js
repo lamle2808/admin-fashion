@@ -199,13 +199,27 @@ export const VisuallyHiddenInput = styled("input")({
 });
 
 export const MenuBtn = styled(ListItemButton)(() => ({
-  borderRadius: 20,
-  backgroundColor: "#81C3FF",
-  color: "white",
-  marginTop: 10,
+  borderRadius: 8,
+  backgroundColor: '#81C3FF',
+  color: 'white',
+  marginTop: 8,
+  marginBottom: 2,
+  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+  transition: 'all 0.2s ease',
+  height: 46,
+  padding: '4px 16px',
   ":hover": {
     backgroundColor: "#2c6fbf",
+    transform: 'translateY(-2px)',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
   },
+  "&.Mui-selected": {
+    backgroundColor: "#2c6fbf",
+    color: "white",
+    "&:hover": {
+      backgroundColor: "#235da3",
+    }
+  }
 }));
 export const NoteDiv = styled("div")(() => ({
   width: "100%",
