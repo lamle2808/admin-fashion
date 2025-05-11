@@ -152,17 +152,16 @@ function ProductEdit() {
         setDescription(response.data.description || "");
         setPrice(response.data.price || "");
         setLoai(response.data.category?.id || "");
-        
+         
         // Lấy thông số kỹ thuật từ backend
-        if (response.data.specifications && Array.isArray(response.data.specifications)) {
-          setSpec(response.data.specifications);
-          
+        if (response.data.productSpecifications && Array.isArray(response.data.productSpecifications)) {
+          setSpec(response.data.productSpecifications);
           // Tìm thông số kỹ thuật cho size và màu sắc
-          const sizeSpec = response.data.specifications.find(
+          const sizeSpec = response.data.productSpecifications.find(
             spec => spec.specificationName === "Kích thước"
           );
           
-          const colorSpec = response.data.specifications.find(
+          const colorSpec = response.data.productSpecifications.find(
             spec => spec.specificationName === "Màu sắc"
           );
           
@@ -570,7 +569,10 @@ function ProductEdit() {
                 </FormButton>
                 <FormButton 
                   variant="contained" 
-                  onClick={() => setModalTk(true)}
+                  onClick={
+                    // () => setModalTk(true)
+                    ()=>setModalTk(true)
+                  }
                 >
                   Thông số kỹ thuật
                 </FormButton>

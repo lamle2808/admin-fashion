@@ -35,10 +35,14 @@ const style = {
 
 const ModalTk = ({ modal, setModal, id, spec, setSpec, category }) => {
   console.log(spec);
-
-  const handleClose = () => {
-    setModal(false);
-  };
+  const groupedBySize = spec.reduce((acc, item) => {
+      if (!acc[item.size]) {
+        acc[item.size] = [];
+      }
+      acc[item.size].push({ color: item.color, count: item.count });
+      return acc;
+    }, {});
+  console.log(groupedBySize);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -71,7 +75,7 @@ const ModalTk = ({ modal, setModal, id, spec, setSpec, category }) => {
   const toggleModal = () => {
     setModal(false);
   };
- 
+
   return (
     <Modal open={modal} onClose={toggleModal}>
     <Box sx={[style, { width: 600 }]}>
@@ -79,30 +83,36 @@ const ModalTk = ({ modal, setModal, id, spec, setSpec, category }) => {
         Thông số kỹ thuật
       </Typography>
       <Box sx={{ overflow: "auto", height: 550, marginTop: 2 }}>
-        {spec.map((item, index) => (
-          <Stack
-            direction={"row"}
-            key={index}
-            sx={{
-              justifyContent: "space-between",
-              backgroundColor: index % 2 === 0 ? "#f0f0f0" : "white",
-              alignItems: "center",
-              padding: 2,
-            }}
-          >
-            <Typography variant="body1" sx={{ width: 300 }}>
-              {item.specificationName}
-            </Typography>
-            <TextField
-              fullWidth
-              multiline
-              rows={2}
-              placeholder="Chờ cập nhật"
-              value={item.specificationValue || ""}
-              onChange={(e) => handleTextFieldChange(index, e.target.value)}
-            />
-          </Stack>
-        ))}
+        {groupedBySize && typeof groupedBySize === "object" ? (
+          Object.entries(groupedBySize).map(([size, items], index) => (
+            <Box key={size} sx={{ marginBottom: 2 }}>
+              <Typography variant="h6">Size: {size}</Typography>
+              {items.map((item, subIndex) => (
+                <Stack
+                  direction="row"
+                  key={subIndex}
+                  sx={{
+                    justifyContent: "space-between",                 
+                    alignItems: "center",
+                    padding: 2,
+                  }}
+                >
+                  <Typography variant="body1" sx={{ width: 300 }}>
+                    {item.color}
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={2}
+                    placeholder="Chờ cập nhật"
+                    value={item.count}
+                    onChange={(e) => handleTextFieldChange(size, subIndex, e.target.value)}
+                  />
+                </Stack>
+              ))}
+            </Box>
+          ))
+        ) : null}
       </Box>
       <Stack
         direction="row"
@@ -119,14 +129,7 @@ const ModalTk = ({ modal, setModal, id, spec, setSpec, category }) => {
           sx={{ width: 150 }}
           onClick={() => setModal(false)}
         >
-          Hủy
-        </Button>
-        <Button
-          variant="contained"
-          sx={{ width: 150 }}
-          onClick={handleSubmit}
-        >
-          Sửa
+          Đóng
         </Button>
       </Stack>
     </Box>
