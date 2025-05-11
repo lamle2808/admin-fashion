@@ -51,12 +51,10 @@ const ImportOrder = () => {
   const [loais, setLoais] = useState("");
   const [brand, setBrand] = useState("");
   const [brands, setBrands] = useState("");
+  const [size, setSize] = useState("");
+  const [color, setColor] = useState("");
   const [productId, setProductId] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [availableSizes, setAvailableSizes] = useState([]);
-  const [availableColors, setAvailableColors] = useState([]);
-  const [selectedSize, setSelectedSize] = useState("");
-  const [selectedColor, setSelectedColor] = useState("");
   const [productsList, setProductsList] = useState([]);
   const userId = localStorage.getItem("id");
   const formRef = useRef(null);
@@ -79,7 +77,7 @@ const ImportOrder = () => {
       .catch(function (error) {
         console.log(error);
       });
-    
+
     // Lấy danh sách sản phẩm
     axios
       .get("/api/v1/products/getAll")
@@ -95,39 +93,21 @@ const ImportOrder = () => {
   const handleProductSelect = (productId) => {
     // Nếu chọn sản phẩm mới, reset form
     if (productId !== product) {
-      setSelectedSize("");
-      setSelectedColor("");
       setQuantity("");
       setPriceImport("");
       setPrice("");
     }
-    
+
     setProduct(productId);
-    
+
     // Lấy thông tin chi tiết sản phẩm
     axios
       .get(`/api/v1/products/getById/${productId}`)
       .then(function (response) {
         const productData = response.data;
         setSelectedProduct(productData);
-        
-        // Trích xuất kích thước và màu sắc từ thông số kỹ thuật
-        const specs = productData.specifications || [];
-        let sizes = [];
-        let colors = [];
-        
-        specs.forEach(spec => {
-          if (spec.specificationName === "Kích thước" && spec.specificationValue) {
-            sizes = spec.specificationValue.split(',').map(s => s.trim()).filter(Boolean);
-          }
-          if (spec.specificationName === "Màu sắc" && spec.specificationValue) {
-            colors = spec.specificationValue.split(',').map(c => c.trim()).filter(Boolean);
-          }
-        });
-        
-        setAvailableSizes(sizes);
-        setAvailableColors(colors);
-        
+        console.log(productData);
+
         // Lấy giá bán hiện tại
         setPrice(productData.price);
         setLoai(productData.category.id);
@@ -172,7 +152,6 @@ const ImportOrder = () => {
         // Sản phẩm mới (chưa có trong hệ thống)
         return {
           importPrice: item.importPrice,
-          quantity: item.quantity,
           loHang: {
             product: {
               quantity: item.quantity,
@@ -184,9 +163,11 @@ const ImportOrder = () => {
               brand: {
                 id: item.hang,
               },
-              specifications: [
-                ...Phanloai(item.loai)
-              ],
+              specifications: {
+                size: item.size,
+                color: item.color,
+                count: item.quantity,
+              },
             },
           },
         };
@@ -194,62 +175,57 @@ const ImportOrder = () => {
         // Sản phẩm đã có trong hệ thống
         return {
           importPrice: item.importPrice,
-          quantity: item.quantity,
-          variant: {
-            size: item.size,
-            color: item.color
-          },
           loHang: {
             product: {
-              quantity: item.quantity,
-              id: item.id,
-              price: item.price // Cập nhật giá mới nếu có thay đổi
+              size: item.size,
+              color: item.color,
+              count: item.quantity,
             },
           },
         };
       }
     });
-
+    console.log(importOrderDetail);
     // Gửi phiếu nhập đến server
-    axios
-      .post(`/api/v1/importOrders/saveOrUpdate`, {
-        supplier: {
-          id: nccD.id,
-        },
-        employee: {
-          id: userId,
-        },
-        importOrderDetail: importOrderDetail,
-      })
-      .then(function (response) {
-        console.log("Phiếu nhập đã được tạo:", response.data);
-        formRef.current.reset();
-        setNccD("");
-        setNcc("");
-        setProducts([]);
-        setSelectedProduct(null);
-        setSelectedSize("");
-        setSelectedColor("");
-        setQuantity("");
-        setPriceImport("");
-        setPrice("");
+    // axios
+    //   .post(`/api/v1/importOrders/saveOrUpdate`, {
+    //     supplier: {
+    //       id: nccD.id,
+    //     },
+    //     employee: {
+    //       id: userId,
+    //     },
+    //     importOrderDetail: importOrderDetail,
+    //   })
+    //   .then(function (response) {
+    //     console.log("Phiếu nhập đã được tạo:", response.data);
+    //     formRef.current.reset();
+    //     setNccD("");
+    //     setNcc("");
+    //     setProducts([]);
+    //     setSelectedProduct(null);
 
-        Swal.fire({
-          title: "Thành công",
-          text: "Đã tạo phiếu nhập hàng thành công",
-          icon: "success",
-        });
-      })
-      .catch(function (error) {
-        console.log("Lỗi khi tạo phiếu nhập:", error);
-        Swal.fire({
-          title: "Lỗi",
-          text: error.response && error.response.data 
-            ? error.response.data 
-            : "Không thể tạo phiếu nhập. Vui lòng thử lại.",
-          icon: "error",
-        });
-      });
+    //     setQuantity("");
+    //     setPriceImport("");
+    //     setPrice("");
+
+    //     Swal.fire({
+    //       title: "Thành công",
+    //       text: "Đã tạo phiếu nhập hàng thành công",
+    //       icon: "success",
+    //     });
+    //   })
+    //   .catch(function (error) {
+    //     console.log("Lỗi khi tạo phiếu nhập:", error);
+    //     Swal.fire({
+    //       title: "Lỗi",
+    //       text:
+    //         error.response && error.response.data
+    //           ? error.response.data
+    //           : "Không thể tạo phiếu nhập. Vui lòng thử lại.",
+    //       icon: "error",
+    //     });
+    //   });
   };
 
   // Tìm kiếm nhà cung cấp
@@ -262,7 +238,7 @@ const ImportOrder = () => {
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
-        }
+        },
       });
 
       axios
@@ -281,7 +257,7 @@ const ImportOrder = () => {
               icon: "question",
               showCancelButton: true,
               confirmButtonText: "Thêm mới",
-              cancelButtonText: "Hủy"
+              cancelButtonText: "Hủy",
             }).then((result) => {
               if (result.isConfirmed) {
                 setOpen(true);
@@ -340,7 +316,7 @@ const ImportOrder = () => {
   // Thêm sản phẩm vào danh sách phiếu nhập
   const handleAdd = (e) => {
     e.preventDefault();
-    
+
     // Kiểm tra nếu là sản phẩm đã có trong hệ thống
     if (product && product !== "new") {
       if (!quantity || !priceImport || !price) {
@@ -351,7 +327,7 @@ const ImportOrder = () => {
         });
         return;
       }
-      
+
       if (quantity <= 0) {
         Swal.fire({
           title: "Lỗi",
@@ -360,42 +336,39 @@ const ImportOrder = () => {
         });
         return;
       }
-      
+
       // Kiểm tra sản phẩm với cùng kích thước và màu sắc đã tồn tại chưa
-      const existingIndex = products.findIndex(
-        item => item.id === product
-      );
-      
-      if (existingIndex >= 0) {
-        // Cập nhật sản phẩm đã có
-        const updatedProducts = [...products];
-        updatedProducts[existingIndex].quantity += Number(quantity);
-        updatedProducts[existingIndex].importPrice = Number(priceImport);
-        updatedProducts[existingIndex].price = Number(price);
-        setProducts(updatedProducts);
-      } else {
-        // Thêm sản phẩm mới
-        setProducts(prev => [
-          ...prev,
-          {
-            id: product,
-            name: selectedProduct.productName,
-            quantity: Number(quantity),
-            importPrice: Number(priceImport),
-            price: Number(price),
-            loai: loai,
-            hang: brand,
-          }
-        ]);
-      }
-      
+
+      // Thêm sản phẩm mới
+      setProducts((prev) => [
+        ...prev,
+        {
+          id: product,
+          name: selectedProduct.productName,
+          quantity: Number(quantity),
+          importPrice: Number(priceImport),
+          price: Number(price),
+          color: color,
+          size: size,
+          loai: loai,
+          hang: brand,
+        },
+      ]);
+
       // Reset form
       setQuantity("");
       setPriceImport("");
-    } 
+    }
     // Kiểm tra nếu là sản phẩm mới
     else if (product === "new") {
-      if (!quantity || !priceImport || !price || !loai || !brand || !productId) {
+      if (
+        !quantity ||
+        !priceImport ||
+        !price ||
+        !loai ||
+        !brand ||
+        !productId
+      ) {
         Swal.fire({
           title: "Lỗi",
           text: "Vui lòng điền đầy đủ thông tin sản phẩm mới",
@@ -403,9 +376,9 @@ const ImportOrder = () => {
         });
         return;
       }
-      
+
       // Thêm sản phẩm mới
-      setProducts(prev => [
+      setProducts((prev) => [
         ...prev,
         {
           id: uuidv4(),
@@ -415,16 +388,17 @@ const ImportOrder = () => {
           price: Number(price),
           loai: loai,
           hang: brand,
-        }
+          color: color,
+          size: size,
+        },
       ]);
-      
+
       // Reset form
       setProductId("");
       setQuantity("");
       setPriceImport("");
       setPrice("");
-    }
-    else {
+    } else {
       Swal.fire({
         title: "Lỗi",
         text: "Vui lòng chọn sản phẩm",
@@ -447,46 +421,52 @@ const ImportOrder = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', width: '100%', minHeight: '100vh' }}>
-      <Box sx={{ width: 250, flexShrink: 0 }}>
-        <Left />
-      </Box>
-      
-      <Box sx={{ 
-        flexGrow: 1, 
-        p: 0, 
-        display: 'flex', 
-        flexDirection: 'column',
-        height: '100vh',
-        overflow: 'hidden'
-      }}>
+    <Box sx={{ display: "flex", width: "100%", minHeight: "100vh" }}>
+      <Box>{show && <Left />}</Box>
+
+      <Box
+        sx={{
+          flexGrow: 1,
+          p: 0,
+          display: "flex",
+          flexDirection: "column",
+          height: "100vh",
+          overflow: "hidden",
+        }}
+      >
         <Box sx={{ flexShrink: 0 }}>
           <Header show={show} setShow={setShow} text="Phiếu nhập hàng" />
         </Box>
 
-        <Box sx={{ 
-          flexGrow: 1, 
-          p: 3, 
-          overflow: 'auto',
-          bgcolor: '#f5f5f5' 
-        }}>
+        <Box
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            overflow: "auto",
+            bgcolor: "#f5f5f5",
+          }}
+        >
           <Grid container spacing={3}>
             <Grid item xs={12} md={5} lg={4}>
               <form ref={formRef}>
                 <Stack spacing={3}>
                   {/* Thông tin nhà cung cấp */}
-                  <Paper 
-                    elevation={2} 
-                    sx={{ 
-                      p: 3, 
+                  <Paper
+                    elevation={2}
+                    sx={{
+                      p: 3,
                       borderRadius: 2,
-                      height: '100%'
+                      height: "100%",
                     }}
                   >
-                    <Typography variant="h6" gutterBottom sx={{ mb: 2, fontWeight: 'bold' }}>
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{ mb: 2, fontWeight: "bold" }}
+                    >
                       Thông tin nhà cung cấp
                     </Typography>
-                    
+
                     <Box sx={{ mb: 3 }}>
                       <Grid container spacing={2}>
                         <Grid item xs={9}>
@@ -499,7 +479,7 @@ const ImportOrder = () => {
                             onChange={(e) => setNcc(e.target.value)}
                             placeholder="Nhập email hoặc số điện thoại để tìm kiếm"
                             InputProps={{
-                              sx: { borderRadius: 1 }
+                              sx: { borderRadius: 1 },
                             }}
                           />
                         </Grid>
@@ -509,7 +489,7 @@ const ImportOrder = () => {
                             onClick={handleFind}
                             disabled={!ncc.trim()}
                             fullWidth
-                            sx={{ height: '100%', borderRadius: 1 }}
+                            sx={{ height: "100%", borderRadius: 1 }}
                           >
                             Tìm kiếm
                           </Button>
@@ -518,53 +498,74 @@ const ImportOrder = () => {
                     </Box>
 
                     {nccD ? (
-                      <Paper 
-                        variant="outlined" 
-                        sx={{ 
-                          p: 2, 
+                      <Paper
+                        variant="outlined"
+                        sx={{
+                          p: 2,
                           borderRadius: 1,
-                          bgcolor: '#f5f5f5',
-                          borderColor: '#2196f3'
+                          bgcolor: "#f5f5f5",
+                          borderColor: "#2196f3",
                         }}
                       >
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            mb: 1,
+                          }}
+                        >
+                          <Typography
+                            variant="subtitle1"
+                            sx={{ fontWeight: "bold" }}
+                          >
                             {nccD.name}
                           </Typography>
-                          <Chip 
-                            label="Đã chọn" 
-                            color="primary" 
-                            size="small" 
+                          <Chip
+                            label="Đã chọn"
+                            color="primary"
+                            size="small"
                             variant="outlined"
                           />
                         </Box>
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={6}>
-                            <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ display: "flex", alignItems: "center" }}
+                            >
                               <strong>Email:</strong>&nbsp;{nccD.email}
                             </Typography>
                           </Grid>
                           <Grid item xs={12} sm={6}>
-                            <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ display: "flex", alignItems: "center" }}
+                            >
                               <strong>SĐT:</strong>&nbsp;{nccD.phone}
                             </Typography>
                           </Grid>
                           <Grid item xs={12}>
-                            <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ display: "flex", alignItems: "center" }}
+                            >
                               <strong>Địa chỉ:</strong>&nbsp;{nccD.address}
                             </Typography>
                           </Grid>
                         </Grid>
                       </Paper>
                     ) : (
-                      <Box sx={{ 
-                        display: 'flex', 
-                        justifyContent: 'center', 
-                        p: 2, 
-                        bgcolor: '#f9f9f9', 
-                        borderRadius: 1,
-                        border: '1px dashed #ccc'
-                      }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          p: 2,
+                          bgcolor: "#f9f9f9",
+                          borderRadius: 1,
+                          border: "1px dashed #ccc",
+                        }}
+                      >
                         <Typography variant="body2" color="text.secondary">
                           Nhập email hoặc số điện thoại để tìm nhà cung cấp
                         </Typography>
@@ -573,14 +574,18 @@ const ImportOrder = () => {
                   </Paper>
 
                   {/* Thông tin sản phẩm nhập */}
-                  <Paper 
-                    elevation={2} 
-                    sx={{ 
+                  <Paper
+                    elevation={2}
+                    sx={{
                       p: 3,
-                      borderRadius: 2 
+                      borderRadius: 2,
                     }}
                   >
-                    <Typography variant="h6" gutterBottom sx={{ mb: 2, fontWeight: 'bold' }}>
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{ mb: 2, fontWeight: "bold" }}
+                    >
                       Thông tin sản phẩm nhập
                     </Typography>
 
@@ -595,11 +600,12 @@ const ImportOrder = () => {
                           <em>Thêm sản phẩm mới</em>
                         </MenuItem>
                         <Divider />
-                        {productsList && productsList.map((item, index) => (
-                          <MenuItem key={index} value={item.id}>
-                            {item.productName}
-                          </MenuItem>
-                        ))}
+                        {productsList &&
+                          productsList.map((item, index) => (
+                            <MenuItem key={index} value={item.id}>
+                              {item.productName}
+                            </MenuItem>
+                          ))}
                       </Select>
                     </FormControl>
 
@@ -625,11 +631,12 @@ const ImportOrder = () => {
                                 label="Loại sản phẩm"
                                 onChange={(e) => setLoai(e.target.value)}
                               >
-                                {loais && loais.map((item, index) => (
-                                  <MenuItem key={index} value={item.id}>
-                                    {item.categoryName}
-                                  </MenuItem>
-                                ))}
+                                {loais &&
+                                  loais.map((item, index) => (
+                                    <MenuItem key={index} value={item.id}>
+                                      {item.categoryName}
+                                    </MenuItem>
+                                  ))}
                               </Select>
                             </FormControl>
                           </Grid>
@@ -641,11 +648,12 @@ const ImportOrder = () => {
                                 label="Thương hiệu"
                                 onChange={(e) => setBrand(e.target.value)}
                               >
-                                {brands && brands.map((item, index) => (
-                                  <MenuItem key={index} value={item.id}>
-                                    {item.name}
-                                  </MenuItem>
-                                ))}
+                                {brands &&
+                                  brands.map((item, index) => (
+                                    <MenuItem key={index} value={item.id}>
+                                      {item.name}
+                                    </MenuItem>
+                                  ))}
                               </Select>
                             </FormControl>
                           </Grid>
@@ -657,19 +665,26 @@ const ImportOrder = () => {
                         {selectedProduct && (
                           <Box sx={{ mb: 2 }}>
                             <Typography variant="subtitle1" gutterBottom>
-                              <strong>Thông tin sản phẩm:</strong> {selectedProduct.productName}
+                              <strong>Thông tin sản phẩm:</strong>{" "}
+                              {selectedProduct.productName}
                             </Typography>
                             <Typography variant="body2">
-                              <strong>Loại:</strong> {selectedProduct.category?.categoryName}
+                              <strong>Loại:</strong>{" "}
+                              {selectedProduct.category?.categoryName}
                             </Typography>
                             <Typography variant="body2">
-                              <strong>Thương hiệu:</strong> {selectedProduct.brand?.name}
+                              <strong>Thương hiệu:</strong>{" "}
+                              {selectedProduct.brand?.name}
                             </Typography>
                             <Typography variant="body2">
-                              <strong>Giá bán hiện tại:</strong> {selectedProduct.price?.toLocaleString()} VNĐ
+                              <strong>Giá bán hiện tại:</strong>{" "}
+                              {selectedProduct.price?.toLocaleString()} VNĐ
                             </Typography>
                             <Typography variant="body2">
-                              <strong>Tình trạng lô hàng:</strong> {selectedProduct.status === 1 ? 'Đang bán' : 'Chưa mở bán'}
+                              <strong>Tình trạng lô hàng:</strong>{" "}
+                              {selectedProduct.status === 1
+                                ? "Đang bán"
+                                : "Chưa mở bán"}
                             </Typography>
                           </Box>
                         )}
@@ -687,9 +702,41 @@ const ImportOrder = () => {
                             variant="outlined"
                             size="small"
                             value={quantity}
-                            onChange={(e) => checkQuantity(Number(e.target.value))}
+                            onChange={(e) =>
+                              checkQuantity(Number(e.target.value))
+                            }
                             error={checkQ}
                             helperText={checkQ ? "Số lượng không hợp lệ" : ""}
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <TextField
+                            fullWidth
+                            type="text"
+                            label="Size"
+                            variant="outlined"
+                            size="small"
+                            value={size}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              // Chỉ cho nhập chữ cái (a-z hoặc A-Z)
+                              if (/^[a-zA-Z]*$/.test(value)) {
+                                setSize(value);
+                              }
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <TextField
+                            fullWidth
+                            type="text"
+                            label="Màu sắc"
+                            variant="outlined"
+                            size="small"
+                            value={color}
+                            onChange={(e) => {
+                              setColor(e.target.value);
+                            }}
                           />
                         </Grid>
                         <Grid item xs={4}>
@@ -700,7 +747,9 @@ const ImportOrder = () => {
                             variant="outlined"
                             size="small"
                             value={priceImport}
-                            onChange={(e) => checkPriceI(Number(e.target.value))}
+                            onChange={(e) =>
+                              checkPriceI(Number(e.target.value))
+                            }
                             error={checkPI}
                             helperText={checkPI ? "Giá nhập không hợp lệ" : ""}
                           />
@@ -721,7 +770,9 @@ const ImportOrder = () => {
                       </Grid>
                     )}
 
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
                       <Button
                         variant="outlined"
                         color="secondary"
@@ -744,21 +795,25 @@ const ImportOrder = () => {
             </Grid>
 
             <Grid item xs={12} md={7} lg={8}>
-              <Paper 
-                elevation={2} 
-                sx={{ 
-                  p: 3, 
+              <Paper
+                elevation={2}
+                sx={{
+                  p: 3,
                   borderRadius: 2,
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column'
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
                 }}
               >
-                <Typography variant="h6" gutterBottom sx={{ mb: 2, fontWeight: 'bold' }}>
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{ mb: 2, fontWeight: "bold" }}
+                >
                   Danh sách sản phẩm trong phiếu nhập
                 </Typography>
 
-                <Box sx={{ flexGrow: 1, overflow: 'hidden', minHeight: 200 }}>
+                <Box sx={{ flexGrow: 1, overflow: "hidden", minHeight: 200 }}>
                   {products && products.length > 0 ? (
                     <TableContainer sx={{ maxHeight: 440, mb: 3 }}>
                       <Table stickyHeader size="small">
@@ -766,6 +821,8 @@ const ImportOrder = () => {
                           <TableRow>
                             <TableCell>Tên sản phẩm</TableCell>
                             <TableCell align="right">Số lượng</TableCell>
+                            <TableCell align="right">Màu sắc</TableCell>
+                            <TableCell align="right">Size</TableCell>
                             <TableCell align="right">Giá nhập</TableCell>
                             <TableCell align="right">Giá bán</TableCell>
                             <TableCell align="right">Thành tiền</TableCell>
@@ -776,16 +833,31 @@ const ImportOrder = () => {
                           {products.map((item, index) => (
                             <TableRow key={index}>
                               <TableCell>{item.name}</TableCell>
-                              <TableCell align="right">{item.quantity}</TableCell>
-                              <TableCell align="right">{item.importPrice?.toLocaleString()} VNĐ</TableCell>
-                              <TableCell align="right">{item.price?.toLocaleString()} VNĐ</TableCell>
-                              <TableCell align="right">{(item.quantity * item.importPrice)?.toLocaleString()} VNĐ</TableCell>
+                              <TableCell align="right">
+                                {item.quantity}
+                              </TableCell>
+                              <TableCell>{item.color}</TableCell>
+                              <TableCell>{item.size}</TableCell>
+                              <TableCell align="right">
+                                {item.importPrice?.toLocaleString()} VNĐ
+                              </TableCell>
+                              <TableCell align="right">
+                                {item.price?.toLocaleString()} VNĐ
+                              </TableCell>
+                              <TableCell align="right">
+                                {(
+                                  item.quantity * item.importPrice
+                                )?.toLocaleString()}{" "}
+                                VNĐ
+                              </TableCell>
                               <TableCell>
                                 <Button
                                   size="small"
                                   color="error"
                                   onClick={() => {
-                                    setProducts(products.filter((_, i) => i !== index));
+                                    setProducts(
+                                      products.filter((_, i) => i !== index)
+                                    );
                                   }}
                                 >
                                   Xóa
@@ -797,15 +869,17 @@ const ImportOrder = () => {
                       </Table>
                     </TableContainer>
                   ) : (
-                    <Box sx={{ 
-                      display: "flex", 
-                      justifyContent: "center", 
-                      alignItems: "center", 
-                      height: 200,
-                      bgcolor: '#f9f9f9',
-                      borderRadius: 1,
-                      border: '1px dashed #ccc'
-                    }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: 200,
+                        bgcolor: "#f9f9f9",
+                        borderRadius: 1,
+                        border: "1px dashed #ccc",
+                      }}
+                    >
                       <Typography variant="subtitle1" color="text.secondary">
                         Chưa có sản phẩm nào trong phiếu nhập
                       </Typography>
@@ -814,16 +888,26 @@ const ImportOrder = () => {
                 </Box>
 
                 {products && products.length > 0 && (
-                  <Box sx={{ 
-                    display: "flex", 
-                    justifyContent: "space-between", 
-                    alignItems: "center",
-                    mt: 2,
-                    pt: 2,
-                    borderTop: '1px solid #e0e0e0'
-                  }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mt: 2,
+                      pt: 2,
+                      borderTop: "1px solid #e0e0e0",
+                    }}
+                  >
                     <Typography variant="h6">
-                      Tổng tiền: {products.reduce((total, item) => total + (item.quantity * item.importPrice), 0).toLocaleString()} VNĐ
+                      Tổng tiền:{" "}
+                      {products
+                        .reduce(
+                          (total, item) =>
+                            total + item.quantity * item.importPrice,
+                          0
+                        )
+                        .toLocaleString()}{" "}
+                      VNĐ
                     </Typography>
                     <Button
                       variant="contained"
@@ -842,7 +926,12 @@ const ImportOrder = () => {
         </Box>
       </Box>
 
-      <ModalNcc modal={open} setModal={setOpen} setNcc={setNcc} setNccD={setNccD} />
+      <ModalNcc
+        modal={open}
+        setModal={setOpen}
+        setNcc={setNcc}
+        setNccD={setNccD}
+      />
     </Box>
   );
 };

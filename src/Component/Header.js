@@ -42,31 +42,34 @@ function Header({ show, setShow, text }) {
   const handleSetting = () => {
     setAnchorEl(null);
   };
+  const handleShow = () => {
+    setShow(!show);
+  };
   return (
-    <StackHeader 
-      direction="row" 
-      color={"text.primary"} 
+    <StackHeader
+      direction="row"
+      color={"text.primary"}
       spacing={2}
       sx={{
         px: 3,
         py: 1.5,
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        alignItems: 'center',
-        borderBottom: '1px solid #e0e0e0',
-        height: 64
+        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+        alignItems: "center",
+        borderBottom: "1px solid #e0e0e0",
+        height: 64,
       }}
     >
-      <IconButton onClick={() => setShow(!show)} sx={{ mr: 1 }}>
+      <IconButton onClick={handleShow} sx={{ mr: 1 }}>
         <MenuIcon />
       </IconButton>
 
-      <Typography 
-        variant="h5" 
-        sx={{ 
-          fontWeight: 500, 
-          flexGrow: 0, 
+      <Typography
+        variant="h5"
+        sx={{
+          fontWeight: 500,
+          flexGrow: 0,
           mr: 3,
-          whiteSpace: 'nowrap'
+          whiteSpace: "nowrap",
         }}
       >
         {text}
@@ -74,13 +77,13 @@ function Header({ show, setShow, text }) {
 
       <Search sx={{ flexGrow: 1, maxWidth: 500 }}>
         <InputBase
-          sx={{ 
-            ml: 2, 
-            width: '90%', 
+          sx={{
+            ml: 2,
+            width: "90%",
             fontSize: 16,
-            '& input': {
-              py: 1
-            }
+            "& input": {
+              py: 1,
+            },
           }}
           fullWidth
           placeholder="Tìm kiếm..."
@@ -92,11 +95,7 @@ function Header({ show, setShow, text }) {
         />
       </Search>
 
-      <Stack 
-        direction="row" 
-        spacing={1}
-        alignItems="center"
-      >
+      <Stack direction="row" spacing={1} alignItems="center">
         <IconButton size="medium">
           <NotificationsIcon />
         </IconButton>
@@ -117,7 +116,7 @@ function Header({ show, setShow, text }) {
                   sx={{ width: 32, height: 32 }}
                 />
               ) : (
-                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+                <Avatar sx={{ width: 32, height: 32, bgcolor: "primary.main" }}>
                   {data?.name?.charAt(0) || "A"}
                 </Avatar>
               )}
