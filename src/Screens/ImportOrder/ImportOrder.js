@@ -146,86 +146,82 @@ const ImportOrder = () => {
       return;
     }
 
-    // Tạo chi tiết phiếu nhập
-    const importOrderDetail = products.map((item) => {
-      if (item.id.length > 30) {
-        // Sản phẩm mới (chưa có trong hệ thống)
+    const grouped = products.reduce((acc, item) => {
+      if (!acc[item.name]) {
+        acc[item.name] = [];
+      }
+      acc[item.name].push(item);
+      return acc;
+    }, {});
+    console.log(grouped);
+    const result = Object.entries(grouped)
+      .map(([name, items]) => {
+        if (!items.length) return null; // Bỏ qua nhóm trống
         return {
-          importPrice: item.importPrice,
+          importPrice: items[0].importPrice,
           loHang: {
             product: {
-              quantity: item.quantity,
-              price: item.price,
-              productName: item.name,
+              id: items[0].id,
+              price: items[0].price,
+              productName: name,
+              quantity: 0,
               category: {
-                id: item.loai,
+                id: items[0].loai,
               },
               brand: {
-                id: item.hang,
+                id: items[0].hang,
               },
-              specifications: {
+              specifications: items.map((item) => ({
                 size: item.size,
                 color: item.color,
                 count: item.quantity,
-              },
+              })),
             },
           },
         };
-      } else {
-        // Sản phẩm đã có trong hệ thống
-        return {
-          importPrice: item.importPrice,
-          loHang: {
-            product: {
-              size: item.size,
-              color: item.color,
-              count: item.quantity,
-            },
-          },
-        };
-      }
-    });
-    console.log(importOrderDetail);
+      })
+      .filter((item) => item !== null);
+
     // Gửi phiếu nhập đến server
-    // axios
-    //   .post(`/api/v1/importOrders/saveOrUpdate`, {
-    //     supplier: {
-    //       id: nccD.id,
-    //     },
-    //     employee: {
-    //       id: userId,
-    //     },
-    //     importOrderDetail: importOrderDetail,
-    //   })
-    //   .then(function (response) {
-    //     console.log("Phiếu nhập đã được tạo:", response.data);
-    //     formRef.current.reset();
-    //     setNccD("");
-    //     setNcc("");
-    //     setProducts([]);
-    //     setSelectedProduct(null);
+    axios
+      .post(`/api/v1/importOrders/saveOrUpdate`, {
+        supplier: {
+          id: nccD.id,
+        },
+        employee: {
+          id: userId,
+        },
+        importOrderDetail: result,
+      })
+      .then(function (response) {
+        console.log("Phiếu nhập đã được tạo:", response.data);
+        formRef.current.reset();
+        setNccD("");
+        setNcc("");
+        setProducts([]);
+        setSelectedProduct(null);
 
-    //     setQuantity("");
-    //     setPriceImport("");
-    //     setPrice("");
+        setQuantity("");
+        setPriceImport("");
+        setPrice("");
 
-    //     Swal.fire({
-    //       title: "Thành công",
-    //       text: "Đã tạo phiếu nhập hàng thành công",
-    //       icon: "success",
-    //     });
-    //   })
-    //   .catch(function (error) {
-    //     console.log("Lỗi khi tạo phiếu nhập:", error);
-    //     Swal.fire({
-    //       title: "Lỗi",
-    //       text:
-    //         error.response && error.response.data
-    //           ? error.response.data
-    //           : "Không thể tạo phiếu nhập. Vui lòng thử lại.",
-    //       icon: "error",
-    //     });
-    //   });
+        Swal.fire({
+          title: "Thành công",
+          text: "Đã tạo phiếu nhập hàng thành công",
+          icon: "success",
+        });
+      })
+      .catch(function (error) {
+        console.log("Lỗi khi tạo phiếu nhập:", error);
+        Swal.fire({
+          title: "Lỗi",
+          text:
+            error.response && error.response.data
+              ? error.response.data
+              : "Không thể tạo phiếu nhập. Vui lòng thử lại.",
+          icon: "error",
+        });
+      });
   };
 
   // Tìm kiếm nhà cung cấp
