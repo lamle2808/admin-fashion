@@ -157,26 +157,32 @@ const ImportOrder = () => {
     const result = Object.entries(grouped)
       .map(([name, items]) => {
         if (!items.length) return null; // Bỏ qua nhóm trống
+
+        const product = {
+          productName: name,
+          price: items[0].price,
+          category: {
+            id: items[0].loai,
+          },
+          brand: {
+            id: items[0].hang,
+          },
+          specifications: items.map((item) => ({
+            size: item.size,
+            color: item.color,
+            count: item.quantity,
+          })),
+        };
+
+        // Thêm id nếu chiều dài nhỏ hơn hoặc bằng 30
+        if (items[0].id && items[0].id.length <= 30) {
+          product.id = items[0].id;
+        }
+
         return {
           importPrice: items[0].importPrice,
           loHang: {
-            product: {
-              id: items[0].id,
-              price: items[0].price,
-              productName: name,
-              quantity: 0,
-              category: {
-                id: items[0].loai,
-              },
-              brand: {
-                id: items[0].hang,
-              },
-              specifications: items.map((item) => ({
-                size: item.size,
-                color: item.color,
-                count: item.quantity,
-              })),
-            },
+            product,
           },
         };
       })
