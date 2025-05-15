@@ -200,12 +200,10 @@ const ImportOrder = () => {
         importOrderDetail: result,
       })
       .then(function (response) {
-        console.log("Phiếu nhập đã được tạo:", response.data);
         formRef.current.reset();
         setNccD("");
         setNcc("");
         setProducts([]);
-        setSelectedProduct(null);
 
         setQuantity("");
         setPriceImport("");

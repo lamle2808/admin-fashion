@@ -9,6 +9,9 @@ import {
   InputAdornment,
   IconButton,
   CircularProgress,
+  FormControl,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
@@ -30,8 +33,8 @@ const StyledTextField = styled(TextField)(() => ({
     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
       borderColor: "#2c6fbf",
       borderWidth: "2px",
-    }
-  }
+    },
+  },
 }));
 
 export default function Table({ setSelect, select }) {
@@ -40,6 +43,12 @@ export default function Table({ setSelect, select }) {
   const [filter, setFilter] = useState("");
   const [selectedItem, setSelectedItem] = useState({});
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
+  const [availableColors, setAvailableColors] = useState("");
+  const [availableSizes, setAvailableSizes] = useState("");
+  const [availableStock, setAvailableStock] = useState("");
+  const [postItem, setPostItem] = useState({});
 
   useEffect(() => {
     // Tải dữ liệu sản phẩm từ server
@@ -54,7 +63,8 @@ export default function Table({ setSelect, select }) {
         console.log("Dữ liệu sản phẩm:", response.data);
         // Đảm bảo dữ liệu trả về là mảng hợp lệ
         if (Array.isArray(response.data)) {
-          setData(response.data);
+          const filtered = response.data.filter((p) => p.loHang !== null);
+          setData(filtered);
         } else {
           console.error("Dữ liệu sản phẩm không phải là mảng:", response.data);
           setData([]);
@@ -75,24 +85,73 @@ export default function Table({ setSelect, select }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(select);
     if (quantity >= 1) {
       const existingItem = select !== "" ? select : [];
       const existingProduct = existingItem.find(
-        (item) => item.product.id === selectedItem.product.id
+        (item) =>
+          item.product.id === selectedItem.product.id &&
+          item.specifications.id === selectedItem.specifications.id
       );
-
       if (existingProduct) {
         const updatedItems = existingItem.map((item) =>
-          item.product.id === selectedItem.product.id
-            ? { ...item, quantity: item.quantity + quantity }
+          item.product.id === selectedItem.product.id &&
+          item.specifications.id === selectedItem.specifications.id
+            ? {
+                ...item,
+                specifications: {
+                  ...item.specifications,
+                  count: item.specifications.count + quantity,
+                },
+              }
             : item
         );
         setSelect(updatedItems);
       } else {
-        setSelect([...existingItem, { ...selectedItem, quantity }]);
+        setSelect([
+          ...existingItem,
+          {
+            ...selectedItem,
+            specifications: { ...selectedItem.specifications, count: quantity },
+          },
+        ]);
       }
       setQuantity(1);
     }
+  };
+
+  const handleSelectItem = (params) => {
+    setSelectedItem({
+      product: {
+        id: params.row.id,
+        productName: params.row.productName,
+        price: params.row.price,
+      },
+
+      loHang: {
+        id: params.row.loHangId || 1, // Giá trị mặc định nếu không có
+      },
+    });
+    setPostItem({ specifications: params.row.productSpecifications });
+    const sizes = [];
+    const colors = [];
+    let stock = 0;
+    console.log(params);
+    params.row.productSpecifications.forEach((spec) => {
+      if (spec.size) {
+        const size = spec.size.trim();
+        sizes.push(size);
+        stock += parseInt(spec.count) || 0;
+        setAvailableStock(stock);
+      }
+      if (spec.color) {
+        colors.push(spec.color.trim());
+      }
+
+      setAvailableSizes([...new Set(sizes)]);
+
+      setAvailableColors([...new Set(colors)]);
+    });
   };
 
   const columns = [
@@ -120,9 +179,9 @@ export default function Table({ setSelect, select }) {
       headerName: "Giá",
       width: 150,
       valueFormatter: (params) => {
-        return params.value
-          .toString()
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " VND";
+        return (
+          params.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " VND"
+        );
       },
       headerClassName: "header-theme",
     },
@@ -138,16 +197,7 @@ export default function Table({ setSelect, select }) {
           size="small"
           startIcon={<AddIcon />}
           onClick={() => {
-            setSelectedItem({
-              product: {
-                id: params.row.id,
-                productName: params.row.productName,
-                price: params.row.price,
-              },
-              loHang: {
-                id: params.row.loHangId || 1, // Giá trị mặc định nếu không có
-              },
-            });
+            handleSelectItem(params);
           }}
           sx={{
             borderRadius: "8px",
@@ -183,42 +233,85 @@ export default function Table({ setSelect, select }) {
     quantity: item.quantity || 0,
     price: item.price || 0,
     loHangId: item.loHang?.id || 1,
+    productSpecifications: item.productSpecifications,
   }));
+  const handleColorbtn = (color) => {
+    setSelectedColor(color);
 
+    const matched = postItem.specifications.find(
+      (spec) => spec.color === color && spec.size === selectedSize
+    );
+
+    if (matched) {
+      setAvailableStock(matched.count);
+      setSelectedItem({
+        ...selectedItem,
+        specifications: {
+          ...selectedItem.specifications,
+          id: matched.id,
+          color: color,
+          size: selectedSize,
+        },
+      });
+    } else {
+      setAvailableStock(0); // hoặc null nếu không tìm thấy
+    }
+  };
+  const handleSizebtn = (size) => {
+    setSelectedSize(size);
+    const matched = postItem.specifications.find(
+      (spec) => spec.size === size && spec.color === selectedColor
+    );
+
+    if (matched) {
+      setAvailableStock(matched.count);
+      console.log(size);
+      setSelectedItem({
+        ...selectedItem,
+        specifications: {
+          ...selectedItem.specifications,
+          id: matched.id,
+          size: size,
+        },
+      });
+    } else {
+      setAvailableStock(0); // hoặc null nếu không tìm thấy
+    }
+  };
   return (
     <StylePaper
       sx={{
         padding: 3,
         borderRadius: 3,
         backgroundColor: "#F8FAFC",
-        height: "85vh"
+        height: "85vh",
       }}
     >
-      <Typography 
-        variant="h5" 
-        fontWeight="600" 
-        color="#2c6fbf" 
+      <Typography
+        variant="h5"
+        fontWeight="600"
+        color="#2c6fbf"
         mb={3}
         sx={{
-          position: 'relative',
-          display: 'inline-block',
+          position: "relative",
+          display: "inline-block",
           "&:after": {
             content: '""',
-            position: 'absolute',
+            position: "absolute",
             bottom: -8,
             left: 0,
-            width: '60px',
-            height: '3px',
-            background: 'linear-gradient(90deg, #81C3FF, #2c6fbf)',
-            borderRadius: '10px'
-          }
+            width: "60px",
+            height: "3px",
+            background: "linear-gradient(90deg, #81C3FF, #2c6fbf)",
+            borderRadius: "10px",
+          },
         }}
       >
         Danh sách sản phẩm
       </Typography>
 
       <Stack direction="row" spacing={2} mb={3}>
-        <StyledTextField 
+        <StyledTextField
           fullWidth
           variant="outlined"
           placeholder="Tìm kiếm sản phẩm..."
@@ -233,14 +326,14 @@ export default function Table({ setSelect, select }) {
         />
       </Stack>
 
-      <StylePaper 
-        sx={{ 
-          height: 'calc(100% - 220px)', 
-          overflow: 'hidden',
+      <StylePaper
+        sx={{
+          height: "calc(100% - 220px)",
+          overflow: "hidden",
           boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-          display: 'flex',
-          justifyContent: loading ? 'center' : 'normal',
-          alignItems: loading ? 'center' : 'normal',
+          display: "flex",
+          justifyContent: loading ? "center" : "normal",
+          alignItems: loading ? "center" : "normal",
         }}
       >
         {loading ? (
@@ -257,11 +350,11 @@ export default function Table({ setSelect, select }) {
               "& .header-theme": {
                 backgroundColor: "#f1f9ff",
                 color: "#2c6fbf",
-                fontWeight: 600
+                fontWeight: 600,
               },
               "& .MuiDataGrid-cell:focus-within": {
-                outline: "none"
-              }
+                outline: "none",
+              },
             }}
           />
         )}
@@ -279,13 +372,13 @@ export default function Table({ setSelect, select }) {
             gap: 2,
             borderRadius: 3,
             backgroundColor: "white",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
           }}
         >
           <Typography variant="h6" fontWeight="600" color="#2c6fbf">
             Thêm sản phẩm vào đơn
           </Typography>
-          
+
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Typography fontWeight="500">
               {selectedItem.product.productName}
@@ -297,26 +390,80 @@ export default function Table({ setSelect, select }) {
               VND
             </Typography>
           </Box>
-          
-          <Stack direction="row" spacing={2} alignItems="center">
+          <Stack direction={"row"} gap={5}>
+            <Box sx={{ width: "100%" }}>
+              <Typography
+                variant="caption"
+                sx={{ display: "block", mb: 0.5, color: "text.secondary" }}
+              >
+                Size
+              </Typography>
+              <FormControl fullWidth size="small">
+                <Select
+                  value={selectedSize}
+                  onChange={(e) => handleSizebtn(e.target.value)}
+                  displayEmpty
+                >
+                  <MenuItem value="" disabled>
+                    <em>Chọn size</em>
+                  </MenuItem>
+                  {availableSizes?.map((size, index) => (
+                    <MenuItem key={index} value={size}>
+                      {size}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Box sx={{ width: "100%" }}>
+              <Typography
+                variant="caption"
+                sx={{ display: "block", mb: 0.5, color: "text.secondary" }}
+              >
+                Màu sắc
+              </Typography>
+              <FormControl fullWidth size="small">
+                <Select
+                  value={selectedColor}
+                  onChange={(e) => handleColorbtn(e.target.value)}
+                  displayEmpty
+                >
+                  <MenuItem value="" disabled>
+                    <em>Chọn màu</em>
+                  </MenuItem>
+                  {availableColors.map((color, index) => (
+                    <MenuItem key={index} value={color}>
+                      {color}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          </Stack>
+          <Stack direction={"row"} sx={{ alignItems: "center" }}>
             <StyledTextField
               type="number"
               label="Số lượng"
               variant="outlined"
               value={quantity}
-              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 0))}
+              onChange={(e) =>
+                setQuantity(Math.max(1, parseInt(e.target.value) || 0))
+              }
               inputProps={{ min: 1 }}
-              error={quantity > selectedItem.product.quantity}
-              helperText={quantity > selectedItem.product.quantity ? "Vượt quá số lượng tồn kho" : ""}
+              error={quantity > availableStock}
+              helperText={
+                quantity > availableStock ? "Vượt quá số lượng tồn kho" : ""
+              }
               sx={{ width: 150 }}
             />
-            <FormButton 
-              type="submit"
-              disabled={quantity > selectedItem.product.quantity}
-            >
-              Thêm vào đơn
-            </FormButton>
+            <Typography variant="h6" sx={{ paddingLeft: 20 }}>
+              Số lượng còn trong kho: {availableStock}
+            </Typography>
           </Stack>
+          <FormButton type="submit" disabled={quantity > availableStock}>
+            Thêm vào đơn
+          </FormButton>
         </Paper>
       ) : null}
     </StylePaper>

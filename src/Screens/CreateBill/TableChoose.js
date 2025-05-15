@@ -23,7 +23,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledDeleteButton = styled(Button)(({ theme }) => ({
-  minWidth: '40px',
+  minWidth: "40px",
   padding: "6px",
   borderRadius: "8px",
   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
@@ -31,8 +31,8 @@ const StyledDeleteButton = styled(Button)(({ theme }) => ({
   "&:hover": {
     background: "rgba(255, 0, 0, 0.04)",
     boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
-    transform: "translateY(-2px)"
-  }
+    transform: "translateY(-2px)",
+  },
 }));
 
 export default function TableChoose({ setSelect, select }) {
@@ -48,10 +48,10 @@ export default function TableChoose({ setSelect, select }) {
   // Kiểm tra nếu không có sản phẩm
   if (!select || (Array.isArray(select) && select.length === 0)) {
     return (
-      <StylePaper 
-        elevation={3} 
-        sx={{ 
-          borderRadius: 3, 
+      <StylePaper
+        elevation={3}
+        sx={{
+          borderRadius: 3,
           overflow: "hidden",
           boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
           p: 2,
@@ -61,23 +61,22 @@ export default function TableChoose({ setSelect, select }) {
       </StylePaper>
     );
   }
-
   return (
-    <StylePaper 
-      elevation={3} 
-      sx={{ 
-        borderRadius: 3, 
+    <StylePaper
+      elevation={3}
+      sx={{
+        borderRadius: 3,
         overflow: "hidden",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
+        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
       }}
     >
-      <Typography 
-        variant="h6" 
-        fontWeight="600" 
-        color="#2c6fbf" 
-        p={2} 
+      <Typography
+        variant="h6"
+        fontWeight="600"
+        color="#2c6fbf"
+        p={2}
         sx={{
-          borderBottom: "1px solid rgba(0,0,0,0.08)"
+          borderBottom: "1px solid rgba(0,0,0,0.08)",
         }}
       >
         Sản phẩm đã chọn
@@ -90,24 +89,37 @@ export default function TableChoose({ setSelect, select }) {
               <StyledTableCell align="right">Số lượng</StyledTableCell>
               <StyledTableCell align="right">Giá</StyledTableCell>
               <StyledTableCell align="center">Thành tiền</StyledTableCell>
+              <StyledTableCell align="center">asd</StyledTableCell>
               <StyledTableCell align="center">Thao tác</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {select.map((row) => (
               <TableRow
-                key={row.product.id}
+                key={row.product.id + row.specifications}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
                   {row.product.productName}
                 </TableCell>
-                <TableCell align="right">{row.quantity}</TableCell>
+                <TableCell align="right">{row.specifications.count}</TableCell>
                 <TableCell align="right">
-                  {row.product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VND
+                  {row.product.price
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}{" "}
+                  VND
                 </TableCell>
-                <TableCell align="right" sx={{ fontWeight: 500, color: "#e44d4d" }}>
-                  {(row.product.price * row.quantity).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VND
+                <TableCell
+                  align="right"
+                  sx={{ fontWeight: 500, color: "#e44d4d" }}
+                >
+                  {(row.product.price * row.specifications.count)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}{" "}
+                  VND
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {row.specifications.color} {row.specifications.size}
                 </TableCell>
                 <TableCell align="center">
                   <StyledDeleteButton
@@ -123,12 +135,15 @@ export default function TableChoose({ setSelect, select }) {
               <TableCell colSpan={3} align="right" sx={{ fontWeight: 600 }}>
                 Tổng tiền:
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: 600, color: "#e44d4d" }}>
+              <TableCell
+                align="right"
+                sx={{ fontWeight: 600, color: "#e44d4d" }}
+              >
                 {select
-                  .reduce(
-                    (n, { product, quantity }) => n + product.price * quantity,
-                    0
-                  )
+                  .reduce((n, item) => {
+                    const count = item.specifications?.count || 0;
+                    return n + item.product.price * count;
+                  }, 0)
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}{" "}
                 VND

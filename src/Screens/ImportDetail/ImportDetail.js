@@ -165,7 +165,7 @@ function ImportDetail() {
                   price: item.importPrice
                     .toString()
                     .replace(/\B(?=(\d{3})+(?!\d))/g, "."),
-                  quantity: item.quantity,
+                  quantity: item.loHang.product.quantity,
                   brand: item.loHang.product.brand.name,
                   loai: item.loHang.product.category.categoryName,
                   loHang: item.loHang.id,
