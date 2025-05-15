@@ -1,0 +1,241 @@
+/* Global CSS styles for admin-fashion app */
+
+/* Font imports */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Common utility classes */
+.text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Hover effects */
+.hover-scale {
+  transition: transform 0.2s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.hover-shadow {
+  transition: box-shadow 0.2s ease;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Card and container styles */
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+  transform: translateY(-3px);
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Form element improvements */
+input, select, textarea {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Button and interactive element enhancements */
+button {
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Status indicators */
+.status-circle {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-active {
+  background-color: #4caf50;
+}
+
+.status-inactive {
+  background-color: #f44336;
+}
+
+.status-pending {
+  background-color: #ff9800;
+}
+
+/* Table improvements */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+th {
+  text-align: left;
+  padding: 16px;
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Page transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Dashboard specific styles */
+.dashboard-card {
+  border-left: 4px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.dashboard-card-primary {
+  border-color: #1976d2;
+}
+
+.dashboard-card-success {
+  border-color: #4caf50;
+}
+
+.dashboard-card-warning {
+  border-color: #ff9800;
+}
+
+.dashboard-card-error {
+  border-color: #f44336;
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .container {
+    padding: 0 16px;
+  }
+  
+  table {
+    font-size: 14px;
+  }
+  
+  th, td {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .container {
+    padding: 0 12px;
+  }
+} 

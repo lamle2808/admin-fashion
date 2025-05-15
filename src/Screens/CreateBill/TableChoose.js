@@ -89,7 +89,7 @@ export default function TableChoose({ setSelect, select }) {
               <StyledTableCell align="right">Số lượng</StyledTableCell>
               <StyledTableCell align="right">Giá</StyledTableCell>
               <StyledTableCell align="center">Thành tiền</StyledTableCell>
-              <StyledTableCell align="center">asd</StyledTableCell>
+              <StyledTableCell align="center">Thông số</StyledTableCell>
               <StyledTableCell align="center">Thao tác</StyledTableCell>
             </TableRow>
           </TableHead>

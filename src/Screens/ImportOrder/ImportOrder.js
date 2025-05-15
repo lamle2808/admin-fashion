@@ -432,10 +432,11 @@ const ImportOrder = () => {
           flexDirection: "column",
           height: "100vh",
           overflow: "hidden",
+          bgcolor: "#f8f9fa",
         }}
       >
         <Box sx={{ flexShrink: 0 }}>
-          <Header show={show} setShow={setShow} text="Phiếu nhập hàng" />
+          <Header show={show} setShow={setShow} text="Quản lý phiếu nhập" />
         </Box>
 
         <Box
@@ -443,7 +444,7 @@ const ImportOrder = () => {
             flexGrow: 1,
             p: 3,
             overflow: "auto",
-            bgcolor: "#f5f5f5",
+            bgcolor: "#f8f9fa",
           }}
         >
           <Grid container spacing={3}>
@@ -452,17 +453,27 @@ const ImportOrder = () => {
                 <Stack spacing={3}>
                   {/* Thông tin nhà cung cấp */}
                   <Paper
-                    elevation={2}
+                    elevation={3}
                     sx={{
                       p: 3,
-                      borderRadius: 2,
+                      borderRadius: "12px",
                       height: "100%",
+                      transition: "box-shadow 0.3s",
+                      '&:hover': {
+                        boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
+                      },
                     }}
                   >
                     <Typography
                       variant="h6"
                       gutterBottom
-                      sx={{ mb: 2, fontWeight: "bold" }}
+                      sx={{ 
+                        mb: 2, 
+                        fontWeight: "bold",
+                        color: "#1976d2",
+                        borderBottom: "2px solid #e0e0e0",
+                        paddingBottom: "8px",
+                      }}
                     >
                       Thông tin nhà cung cấp
                     </Typography>
@@ -479,7 +490,7 @@ const ImportOrder = () => {
                             onChange={(e) => setNcc(e.target.value)}
                             placeholder="Nhập email hoặc số điện thoại để tìm kiếm"
                             InputProps={{
-                              sx: { borderRadius: 1 },
+                              sx: { borderRadius: "8px" },
                             }}
                           />
                         </Grid>
@@ -489,7 +500,14 @@ const ImportOrder = () => {
                             onClick={handleFind}
                             disabled={!ncc.trim()}
                             fullWidth
-                            sx={{ height: "100%", borderRadius: 1 }}
+                            sx={{ 
+                              height: "100%", 
+                              borderRadius: "8px",
+                              bgcolor: "#1976d2",
+                              '&:hover': {
+                                bgcolor: "#1565c0"
+                              } 
+                            }}
                           >
                             Tìm kiếm
                           </Button>
@@ -502,9 +520,10 @@ const ImportOrder = () => {
                         variant="outlined"
                         sx={{
                           p: 2,
-                          borderRadius: 1,
+                          borderRadius: "8px",
                           bgcolor: "#f5f5f5",
                           borderColor: "#2196f3",
+                          borderWidth: "2px",
                         }}
                       >
                         <Box
@@ -525,7 +544,7 @@ const ImportOrder = () => {
                             label="Đã chọn"
                             color="primary"
                             size="small"
-                            variant="outlined"
+                            variant="filled"
                           />
                         </Box>
                         <Grid container spacing={2}>
@@ -560,10 +579,12 @@ const ImportOrder = () => {
                         sx={{
                           display: "flex",
                           justifyContent: "center",
-                          p: 2,
+                          p: 3,
                           bgcolor: "#f9f9f9",
-                          borderRadius: 1,
-                          border: "1px dashed #ccc",
+                          borderRadius: "8px",
+                          border: "1px dashed #bdbdbd",
+                          minHeight: "100px",
+                          alignItems: "center",
                         }}
                       >
                         <Typography variant="body2" color="text.secondary">
@@ -575,16 +596,26 @@ const ImportOrder = () => {
 
                   {/* Thông tin sản phẩm nhập */}
                   <Paper
-                    elevation={2}
+                    elevation={3}
                     sx={{
                       p: 3,
-                      borderRadius: 2,
+                      borderRadius: "12px",
+                      transition: "box-shadow 0.3s",
+                      '&:hover': {
+                        boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
+                      },
                     }}
                   >
                     <Typography
                       variant="h6"
                       gutterBottom
-                      sx={{ mb: 2, fontWeight: "bold" }}
+                      sx={{ 
+                        mb: 2, 
+                        fontWeight: "bold",
+                        color: "#1976d2",
+                        borderBottom: "2px solid #e0e0e0",
+                        paddingBottom: "8px",
+                      }}
                     >
                       Thông tin sản phẩm nhập
                     </Typography>
@@ -595,6 +626,7 @@ const ImportOrder = () => {
                         value={product}
                         label="Chọn sản phẩm"
                         onChange={(e) => handleProductSelect(e.target.value)}
+                        sx={{ borderRadius: "8px" }}
                       >
                         <MenuItem value="new">
                           <em>Thêm sản phẩm mới</em>
@@ -707,6 +739,9 @@ const ImportOrder = () => {
                             }
                             error={checkQ}
                             helperText={checkQ ? "Số lượng không hợp lệ" : ""}
+                            InputProps={{
+                              sx: { borderRadius: "8px" },
+                            }}
                           />
                         </Grid>
                         <Grid item xs={4}>
@@ -724,6 +759,9 @@ const ImportOrder = () => {
                                 setSize(value);
                               }
                             }}
+                            InputProps={{
+                              sx: { borderRadius: "8px" },
+                            }}
                           />
                         </Grid>
                         <Grid item xs={4}>
@@ -736,6 +774,9 @@ const ImportOrder = () => {
                             value={color}
                             onChange={(e) => {
                               setColor(e.target.value);
+                            }}
+                            InputProps={{
+                              sx: { borderRadius: "8px" },
                             }}
                           />
                         </Grid>
@@ -752,6 +793,9 @@ const ImportOrder = () => {
                             }
                             error={checkPI}
                             helperText={checkPI ? "Giá nhập không hợp lệ" : ""}
+                            InputProps={{
+                              sx: { borderRadius: "8px" },
+                            }}
                           />
                         </Grid>
                         <Grid item xs={4}>
@@ -765,6 +809,9 @@ const ImportOrder = () => {
                             onChange={(e) => checkPrice(Number(e.target.value))}
                             error={checkP}
                             helperText={checkP ? "Giá bán không hợp lệ" : ""}
+                            InputProps={{
+                              sx: { borderRadius: "8px" },
+                            }}
                           />
                         </Grid>
                       </Grid>
@@ -777,6 +824,10 @@ const ImportOrder = () => {
                         variant="outlined"
                         color="secondary"
                         onClick={handleWhite}
+                        sx={{ 
+                          borderRadius: "8px",
+                          borderWidth: "2px"
+                        }}
                       >
                         Xóa trắng
                       </Button>
@@ -785,6 +836,13 @@ const ImportOrder = () => {
                         color="primary"
                         onClick={handleAdd}
                         disabled={!product || checkQ || checkP || checkPI}
+                        sx={{ 
+                          borderRadius: "8px",
+                          bgcolor: "#1976d2",
+                          '&:hover': {
+                            bgcolor: "#1565c0"
+                          } 
+                        }}
                       >
                         Thêm vào phiếu nhập
                       </Button>
@@ -796,42 +854,52 @@ const ImportOrder = () => {
 
             <Grid item xs={12} md={7} lg={8}>
               <Paper
-                elevation={2}
+                elevation={3}
                 sx={{
                   p: 3,
-                  borderRadius: 2,
+                  borderRadius: "12px",
                   height: "100%",
                   display: "flex",
                   flexDirection: "column",
+                  transition: "box-shadow 0.3s",
+                  '&:hover': {
+                    boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
+                  },
                 }}
               >
                 <Typography
                   variant="h6"
                   gutterBottom
-                  sx={{ mb: 2, fontWeight: "bold" }}
+                  sx={{ 
+                    mb: 2, 
+                    fontWeight: "bold",
+                    color: "#1976d2",
+                    borderBottom: "2px solid #e0e0e0",
+                    paddingBottom: "8px",
+                  }}
                 >
                   Danh sách sản phẩm trong phiếu nhập
                 </Typography>
 
                 <Box sx={{ flexGrow: 1, overflow: "hidden", minHeight: 200 }}>
                   {products && products.length > 0 ? (
-                    <TableContainer sx={{ maxHeight: 440, mb: 3 }}>
+                    <TableContainer sx={{ maxHeight: 440, mb: 3, borderRadius: "8px", border: "1px solid #e0e0e0" }}>
                       <Table stickyHeader size="small">
                         <TableHead>
-                          <TableRow>
-                            <TableCell>Tên sản phẩm</TableCell>
-                            <TableCell align="right">Số lượng</TableCell>
-                            <TableCell align="right">Màu sắc</TableCell>
-                            <TableCell align="right">Size</TableCell>
-                            <TableCell align="right">Giá nhập</TableCell>
-                            <TableCell align="right">Giá bán</TableCell>
-                            <TableCell align="right">Thành tiền</TableCell>
-                            <TableCell>Hành động</TableCell>
+                          <TableRow sx={{ bgcolor: "#f5f5f5" }}>
+                            <TableCell sx={{ fontWeight: "bold" }}>Tên sản phẩm</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: "bold" }}>Số lượng</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: "bold" }}>Màu sắc</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: "bold" }}>Size</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: "bold" }}>Giá nhập</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: "bold" }}>Giá bán</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: "bold" }}>Thành tiền</TableCell>
+                            <TableCell sx={{ fontWeight: "bold" }}>Hành động</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                           {products.map((item, index) => (
-                            <TableRow key={index}>
+                            <TableRow key={index} sx={{ '&:nth-of-type(odd)': { bgcolor: "#fafafa" } }}>
                               <TableCell>{item.name}</TableCell>
                               <TableCell align="right">
                                 {item.quantity}
@@ -859,6 +927,7 @@ const ImportOrder = () => {
                                       products.filter((_, i) => i !== index)
                                     );
                                   }}
+                                  sx={{ borderRadius: "6px" }}
                                 >
                                   Xóa
                                 </Button>
@@ -876,8 +945,8 @@ const ImportOrder = () => {
                         alignItems: "center",
                         height: 200,
                         bgcolor: "#f9f9f9",
-                        borderRadius: 1,
-                        border: "1px dashed #ccc",
+                        borderRadius: "8px",
+                        border: "1px dashed #bdbdbd",
                       }}
                     >
                       <Typography variant="subtitle1" color="text.secondary">
@@ -898,16 +967,18 @@ const ImportOrder = () => {
                       borderTop: "1px solid #e0e0e0",
                     }}
                   >
-                    <Typography variant="h6">
+                    <Typography variant="h6" sx={{ color: "#1976d2", fontWeight: "bold" }}>
                       Tổng tiền:{" "}
-                      {products
-                        .reduce(
-                          (total, item) =>
-                            total + item.quantity * item.importPrice,
-                          0
-                        )
-                        .toLocaleString()}{" "}
-                      VNĐ
+                      <span style={{ color: "#e53935" }}>
+                        {products
+                          .reduce(
+                            (total, item) =>
+                              total + item.quantity * item.importPrice,
+                            0
+                          )
+                          .toLocaleString()}{" "}
+                        VNĐ
+                      </span>
                     </Typography>
                     <Button
                       variant="contained"
@@ -915,6 +986,16 @@ const ImportOrder = () => {
                       size="large"
                       onClick={handleSubmit}
                       disabled={!nccD || products.length === 0}
+                      sx={{ 
+                        borderRadius: "8px",
+                        px: 4,
+                        py: 1.5,
+                        fontWeight: "bold",
+                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                        '&:hover': {
+                          boxShadow: "0 6px 12px rgba(0,0,0,0.2)"
+                        }
+                      }}
                     >
                       Tạo phiếu nhập
                     </Button>

@@ -1,181 +1,304 @@
 import {
   Avatar,
   Box,
-  Divider,
   IconButton,
-  InputAdornment,
   InputBase,
-  ListItemIcon,
+  Paper,
+  Stack,
+  Typography,
+  Badge,
   Menu,
   MenuItem,
-  Stack,
-  Tooltip,
-  Typography,
+  Divider,
+  ListItemIcon,
 } from "@mui/material";
 import { StackHeader, Search } from "./Style";
-import SearchIcon from "@mui/icons-material/Search";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import { Logout, Settings } from "@mui/icons-material";
-import { memo, useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import { useState } from "react";
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from '@mui/icons-material/Logout';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import Tooltip from '@mui/material/Tooltip';
 import { useNavigate } from "react-router-dom";
 
-function Header({ show, setShow, text }) {
-  const navigate = useNavigate();
-
+function Header({ text, show, setShow }) {
+  const [click, setClick] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
+  const navigate = useNavigate();
   const open = Boolean(anchorEl);
+  const notificationOpen = Boolean(notificationAnchorEl);
 
-  const [data, setData] = useState("");
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
+    : {};
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handlePf = () => {
-    setAnchorEl(null);
-    navigate("/Profile");
-  };
-  const handleSetting = () => {
-    setAnchorEl(null);
-  };
-  const handleShow = () => {
+  const handleClick = () => {
+    setClick(!click);
     setShow(!show);
   };
+
+  const handleProfileClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleNotificationClick = (event) => {
+    setNotificationAnchorEl(event.currentTarget);
+  };
+
+  const handleNotificationClose = () => {
+    setNotificationAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    // Xử lý đăng xuất
+    localStorage.removeItem("user");
+    localStorage.removeItem("id");
+    localStorage.removeItem("role");
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
   return (
     <StackHeader
-      direction="row"
-      color={"text.primary"}
-      spacing={2}
+      direction={"row"}
       sx={{
+        width: "100%",
         px: 3,
-        py: 1.5,
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-        alignItems: "center",
-        borderBottom: "1px solid #e0e0e0",
-        height: 64,
+        py: 2,
+        boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+        backgroundColor: "white"
       }}
     >
-      <IconButton onClick={handleShow} sx={{ mr: 1 }}>
-        <MenuIcon />
-      </IconButton>
-
-      <Typography
-        variant="h5"
-        sx={{
-          fontWeight: 500,
-          flexGrow: 0,
-          mr: 3,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {text}
-      </Typography>
-
-      <Search sx={{ flexGrow: 1, maxWidth: 500 }}>
-        <InputBase
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <IconButton
+          onClick={handleClick}
           sx={{
-            ml: 2,
-            width: "90%",
-            fontSize: 16,
-            "& input": {
-              py: 1,
-            },
+            borderRadius: "8px",
+            backgroundColor: click ? "#f0f7ff" : "transparent",
+            color: click ? "#1976d2" : "inherit",
+            transition: "all 0.2s ease",
+            '&:hover': {
+              backgroundColor: "#e3f2fd"
+            }
           }}
-          fullWidth
-          placeholder="Tìm kiếm..."
-          startAdornment={
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          }
-        />
-      </Search>
-
-      <Stack direction="row" spacing={1} alignItems="center">
-        <IconButton size="medium">
-          <NotificationsIcon />
+        >
+          <MenuIcon />
         </IconButton>
 
-        <Box>
-          <Tooltip title="Tài khoản">
-            <IconButton
-              onClick={handleClick}
-              size="small"
-              aria-controls={open ? "account-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-            >
-              {data.avatar !== null ? (
-                <Avatar
-                  alt="Avatar"
-                  src={data.avatar}
-                  sx={{ width: 32, height: 32 }}
-                />
-              ) : (
-                <Avatar sx={{ width: 32, height: 32, bgcolor: "primary.main" }}>
-                  {data?.name?.charAt(0) || "A"}
-                </Avatar>
-              )}
-            </IconButton>
-          </Tooltip>
-        </Box>
+        <Typography 
+          variant="h6" 
+          className="fade-in"
+          sx={{ 
+            fontWeight: 600,
+            color: "#1976d2",
+            display: { xs: "none", sm: "block" },
+            letterSpacing: "0.2px",
+          }}
+        >
+          {text}
+        </Typography>
+      </Box>
+
+      <Stack direction={"row"} spacing={2} alignItems={"center"}>
+        <Paper
+          component="form"
+          sx={{
+            p: '2px 12px',
+            display: 'flex',
+            alignItems: 'center',
+            width: { xs: 150, sm: 250, md: 300 },
+            borderRadius: "50px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+            border: "1px solid #eeeeee",
+            backgroundColor: "#f9f9f9",
+            transition: "all 0.3s ease",
+            '&:hover': {
+              boxShadow: "0 3px 12px rgba(0,0,0,0.08)",
+              backgroundColor: "#ffffff"
+            }
+          }}
+        >
+          <SearchIcon sx={{ color: 'action.active', mr: 1 }} />
+          <InputBase
+            sx={{ ml: 1, flex: 1 }}
+            placeholder="Tìm kiếm..."
+            inputProps={{ 'aria-label': 'tìm kiếm' }}
+          />
+        </Paper>
+
+        {/* Notification Icon */}
+        <Tooltip title="Thông báo">
+          <IconButton 
+            onClick={handleNotificationClick}
+            sx={{
+              backgroundColor: notificationOpen ? "#f0f7ff" : "white",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+              border: "1px solid #eeeeee",
+              transition: "all 0.2s ease",
+              '&:hover': {
+                backgroundColor: "#e3f2fd"
+              }
+            }}
+          >
+            <Badge badgeContent={3} color="error">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
+        </Tooltip>
+
+        {/* Dropdown menu for notifications */}
         <Menu
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          // onClick={handleClose}
+          anchorEl={notificationAnchorEl}
+          id="notification-menu"
+          open={notificationOpen}
+          onClose={handleNotificationClose}
+          onClick={handleNotificationClose}
           PaperProps={{
-            elevation: 0,
+            elevation: 3,
             sx: {
-              overflow: "visible",
-              filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+              overflow: 'visible',
+              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.1))',
               mt: 1.5,
-              "& .MuiAvatar-root": {
+              borderRadius: '12px',
+              minWidth: 300,
+              '& .MuiAvatar-root': {
                 width: 32,
                 height: 32,
                 ml: -0.5,
                 mr: 1,
               },
-              "&:before": {
-                content: '""',
-                display: "block",
-                position: "absolute",
-                top: 0,
-                right: 14,
-                width: 10,
-                height: 10,
-                bgcolor: "background.paper",
-                transform: "translateY(-50%) rotate(45deg)",
-                zIndex: 0,
+            },
+          }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        >
+          <Box sx={{ p: 2, borderBottom: '1px solid #eee' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Thông báo</Typography>
+          </Box>
+          
+          <MenuItem sx={{ py: 1.5 }}>
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>Đơn hàng mới #2342</Typography>
+              <Typography variant="caption" color="text.secondary">
+                15 phút trước
+              </Typography>
+            </Box>
+          </MenuItem>
+          
+          <MenuItem sx={{ py: 1.5 }}>
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>Cập nhật lô hàng PNH2610</Typography>
+              <Typography variant="caption" color="text.secondary">
+                2 giờ trước
+              </Typography>
+            </Box>
+          </MenuItem>
+          
+          <MenuItem sx={{ py: 1.5 }}>
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>Sắp hết hàng sản phẩm #SP032</Typography>
+              <Typography variant="caption" color="text.secondary">
+                Hôm qua, 14:30
+              </Typography>
+            </Box>
+          </MenuItem>
+          
+          <Divider />
+          <MenuItem sx={{ justifyContent: 'center', color: 'primary.main', py: 1.5 }}>
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>Xem tất cả thông báo</Typography>
+          </MenuItem>
+        </Menu>
+
+        {/* Profile Avatar and Menu */}
+        <Tooltip title="Tài khoản">
+          <IconButton
+            onClick={handleProfileClick}
+            size="small"
+            aria-controls={open ? 'account-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? 'true' : undefined}
+            sx={{
+              ml: 1,
+              backgroundColor: open ? "#f0f7ff" : "white",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+              border: "1px solid #eeeeee",
+              padding: "4px",
+              transition: "all 0.2s ease",
+              '&:hover': {
+                backgroundColor: "#e3f2fd"
+              }
+            }}
+          >
+            <Avatar 
+              sx={{ 
+                width: 32, 
+                height: 32,
+                bgcolor: "#1976d2"
+              }}
+            >
+              {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+            </Avatar>
+          </IconButton>
+        </Tooltip>
+
+        {/* Dropdown menu for account */}
+        <Menu
+          anchorEl={anchorEl}
+          id="account-menu"
+          open={open}
+          onClose={handleProfileClose}
+          onClick={handleProfileClose}
+          PaperProps={{
+            elevation: 3,
+            sx: {
+              overflow: 'visible',
+              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.1))',
+              mt: 1.5,
+              borderRadius: '12px',
+              '& .MuiAvatar-root': {
+                width: 32,
+                height: 32,
+                ml: -0.5,
+                mr: 1,
               },
             },
           }}
-          transformOrigin={{ horizontal: "right", vertical: "top" }}
-          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          <MenuItem onClick={handlePf}>
-            {data.avatar !== null ? (
-              <Avatar alt="Avatar" src={data.avatar} />
-            ) : (
-              <Avatar>V</Avatar>
-            )}
-            Trang cá nhân
-          </MenuItem>
-
-          <Divider />
-          <MenuItem onClick={handleSetting}>
+          <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid #eee' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>{user.name || "User"}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              {user.email || "user@example.com"}
+            </Typography>
+          </Box>
+          
+          <MenuItem onClick={() => navigate('/Profile')}>
             <ListItemIcon>
-              <Settings fontSize="small" />
+              <AccountCircleIcon fontSize="small" />
+            </ListItemIcon>
+            Thông tin cá nhân
+          </MenuItem>
+          
+          <MenuItem>
+            <ListItemIcon>
+              <SettingsIcon fontSize="small" />
             </ListItemIcon>
             Cài đặt
           </MenuItem>
-          <MenuItem onClick={() => navigate("/")}>
+          
+          <Divider />
+          
+          <MenuItem onClick={handleLogout}>
             <ListItemIcon>
-              <Logout fontSize="small" />
+              <LogoutIcon fontSize="small" />
             </ListItemIcon>
             Đăng xuất
           </MenuItem>
@@ -185,4 +308,4 @@ function Header({ show, setShow, text }) {
   );
 }
 
-export default memo(Header);
+export default Header;

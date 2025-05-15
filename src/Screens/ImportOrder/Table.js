@@ -18,29 +18,49 @@ const Table = (props) => {
       headerName: "Tên",
       flex: 1,
       editable: true,
+      headerClassName: 'super-app-theme--header',
+      cellClassName: 'super-app-theme--cell',
     },
     {
       field: "quantity",
       headerName: "Số lượng",
-      width: 80,
+      width: 90,
       editable: true,
+      headerClassName: 'super-app-theme--header',
+      cellClassName: 'super-app-theme--cell',
+      headerAlign: 'center',
+      align: 'center',
     },
     {
       field: "importPrice",
       headerName: "Giá nhập",
-      width: 80,
+      width: 110,
       editable: true,
+      headerClassName: 'super-app-theme--header',
+      cellClassName: 'super-app-theme--cell',
+      headerAlign: 'right',
+      align: 'right',
+      valueFormatter: (params) => `${Number(params.value).toLocaleString()} VNĐ`,
     },
     {
       field: "actions",
       headerName: "Xóa",
       type: "actions",
       flex: 0.5,
+      headerClassName: 'super-app-theme--header',
       getActions: (params) => {
         let actions = [
           <>
             <Tooltip title="Xóa" placement="left">
-              <IconButton onClick={() => handleDeleteClick(params.id)}>
+              <IconButton 
+                onClick={() => handleDeleteClick(params.id)}
+                sx={{
+                  color: '#f44336',
+                  '&:hover': {
+                    backgroundColor: '#ffebee',
+                  }
+                }}
+              >
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
@@ -67,7 +87,9 @@ const Table = (props) => {
         height: 400,
         width: "100%",
         backgroundColor: "white",
-        borderRadius: 5,
+        borderRadius: "12px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+        overflow: "hidden",
       }}
     >
       <DataGrid
@@ -88,7 +110,32 @@ const Table = (props) => {
         }}
         getRowHeight={() => "auto"}
         sx={{
-          borderRadius: 5,
+          border: 'none',
+          '& .super-app-theme--header': {
+            backgroundColor: '#e3f2fd',
+            color: '#1976d2',
+            fontWeight: 'bold',
+          },
+          '& .super-app-theme--cell': {
+            '&:hover': {
+              backgroundColor: '#f5f5f5',
+            },
+          },
+          '& .MuiDataGrid-row:hover': {
+            backgroundColor: '#f5f5f5',
+          },
+          '& .MuiDataGrid-row:nth-of-type(odd)': {
+            backgroundColor: '#fafafa',
+          },
+          '& .MuiDataGrid-cell': {
+            borderBottom: '1px solid #e0e0e0',
+          },
+          '& .MuiDataGrid-columnHeaders': {
+            borderBottom: '2px solid #bbdefb',
+          },
+          '& .MuiDataGrid-footerContainer': {
+            borderTop: '2px solid #bbdefb',
+          },
           "&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell": {
             py: 1,
           },
@@ -99,7 +146,6 @@ const Table = (props) => {
             py: "10px",
           },
         }}
-        // hideFooter
         processRowUpdate={processRowUpdate}
         onCellEditStop={(params, event) => {
           if (params.reason === GridCellEditStopReasons.cellFocusOut) {

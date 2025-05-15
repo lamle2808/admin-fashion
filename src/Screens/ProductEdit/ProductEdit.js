@@ -574,14 +574,14 @@ function ProductEdit() {
                     ()=>setModalTk(true)
                   }
                 >
-                  Thông số kỹ thuật
+                  Mẫu mã
                 </FormButton>
                 <FormButton 
                   variant="contained" 
                   color="success" 
                   onClick={() => setModalStt(true)}
                 >
-                  Set tình trạng lô hàng
+                  Tình trạng sản phẩm
                 </FormButton>
               </Stack>
               <form noValidate onSubmit={handleSubmit}>

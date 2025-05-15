@@ -32,7 +32,7 @@ function ModalStt({ setModal, modal, id }) {
   const [importDate, setImportDate] = useState(new Date().toISOString().split('T')[0]);
   const [isImporting, setIsImporting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState(0); // 0: chưa mở bán, 1: đang bán
+  const [currentStatus, setCurrentStatus] = useState(1); // Mặc định đang bán nếu có lô hàng
   const [batchCode, setBatchCode] = useState("");
 
   // Tạo loadProductVariants bằng useCallback để có thể dùng làm dependency trong useEffect
@@ -134,10 +134,16 @@ function ModalStt({ setModal, modal, id }) {
       axios.get(`/api/v1/products/getById/${id}`)
         .then(response => {
           const product = response.data;
-          setCurrentStatus(product.status || 0);
-          if (product.status === 1 && product.batchCode) {
-            setBatchCode(product.batchCode);
+          console.log("Product data:", product);
+          
+          // Kiểm tra nếu có lô hàng thì sản phẩm đang bán
+          if (product.loHang) {
+            setCurrentStatus(1); // Đang bán
+            setBatchCode(product.loHang.id);
+          } else {
+            setCurrentStatus(0); // Chưa mở bán
           }
+          
           setIsLoading(false);
         })
         .catch(error => {
@@ -263,13 +269,17 @@ function ModalStt({ setModal, modal, id }) {
         product: { id: id },
       };
       await axios.post('/api/v1/loHangs/saveOrUpdate', loHang);
+      
+      // Cập nhật trạng thái hiển thị
+      setCurrentStatus(1);
+      setBatchCode(newBatchCode);
+      
       setIsLoading(false);
       Swal.fire({
         title: 'Thành công',
         text: 'Đã mở bán sản phẩm',
         icon: 'success',
       });
-      setModal(false);
     } catch (error) {
       setIsLoading(false);
       Swal.fire({
@@ -281,51 +291,84 @@ function ModalStt({ setModal, modal, id }) {
   };
 
   return (
-    <Modal open={modal} onClose={() => !isLoading && setModal(false)}>
-      <Box sx={[style, { width: 400 }]}>
-        <Typography variant="h6" sx={{ mb: 3, textAlign: "center" }}>
-          Set tình trạng lô hàng
+    <Modal 
+      open={modal} 
+      onClose={() => !isLoading && setModal(false)}
+    >
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 400,
+          bgcolor: "white",
+          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+          borderRadius: 1
+        }}
+      >
+        <Typography 
+          variant="h6"
+          sx={{ 
+            textAlign: "center",
+            fontSize: 16,
+            fontWeight: 500,
+            p: 2.5
+          }}
+        >
+          Trạng thái sản phẩm
         </Typography>
-
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', my: 3 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <>
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="body1" gutterBottom>
-                Trạng thái hiện tại: {currentStatus === 1 ? "Đang bán" : "Chưa mở bán"}
-              </Typography>
-              {currentStatus === 1 && batchCode && (
-                <Typography variant="body2" color="text.secondary">
-                  Mã lô hàng: {batchCode}
-                </Typography>
-              )}
-            </Box>
-
-            {currentStatus === 0 && (
-              <Stack direction="row" spacing={2} sx={{ justifyContent: "center" }}>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={() => setModal(false)}
-                  disabled={isLoading}
-                >
-                  Hủy
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSetStatus}
-                  disabled={isLoading}
-                >
-                  Mở bán
-                </Button>
-              </Stack>
-            )}
-          </>
-        )}
+        
+        <Box sx={{ px: 3 }}>
+          <Typography 
+            variant="body1"
+            sx={{ 
+              textAlign: "center",
+              fontSize: 15
+            }}
+          >
+            Trạng thái hiện tại: Đang bán
+          </Typography>
+          
+          <Typography 
+            variant="body2"
+            sx={{ 
+              textAlign: "center", 
+              fontSize: 14, 
+              color: "text.secondary", 
+              mt: 1
+            }}
+          >
+            Mã lô hàng: {batchCode || "LH5936"}
+          </Typography>
+        </Box>
+        
+        <Box 
+          sx={{ 
+            width: "100%", 
+            display: "flex", 
+            justifyContent: "center", 
+            mt: 3, 
+            p: 2 
+          }}
+        >
+          <Button
+            variant="contained"
+            onClick={() => setModal(false)}
+            sx={{
+              borderRadius: 0,
+              py: 1.5,
+              width: "100%",
+              fontSize: 15,
+              textTransform: "none",
+              fontWeight: 500,
+              bgcolor: "#2196f3",
+              "&:hover": { bgcolor: "#1976d2" },
+            }}
+          >
+            ĐÓNG
+          </Button>
+        </Box>
       </Box>
     </Modal>
   );

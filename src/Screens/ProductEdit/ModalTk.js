@@ -78,63 +78,79 @@ const ModalTk = ({ modal, setModal, id, spec, setSpec, category }) => {
 
   return (
     <Modal open={modal} onClose={toggleModal}>
-    <Box sx={[style, { width: 600 }]}>
-      <Typography variant="h4" sx={{ textAlign: "center" }}>
-        Thông số kỹ thuật
-      </Typography>
-      <Box sx={{ overflow: "auto", height: 550, marginTop: 2 }}>
-        {groupedBySize && typeof groupedBySize === "object" ? (
-          Object.entries(groupedBySize).map(([size, items], index) => (
-            <Box key={size} sx={{ marginBottom: 2 }}>
-              <Typography variant="h6">Size: {size}</Typography>
-              {items.map((item, subIndex) => (
-                <Stack
-                  direction="row"
-                  key={subIndex}
-                  sx={{
-                    justifyContent: "space-between",                 
-                    alignItems: "center",
-                    padding: 2,
-                  }}
-                >
-                  <Typography variant="body1" sx={{ width: 300 }}>
-                    {item.color}
+      <Box sx={[style, { width: 400, bgcolor: "white", p: 0 }]}>
+        <Box sx={{ p: 3, pb: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: "600", textAlign: "center" }}>
+            Mẫu mã
+          </Typography>
+        </Box>
+        
+        <Box sx={{ maxHeight: 500, overflow: "auto" }}>
+          {groupedBySize && typeof groupedBySize === "object" ? (
+            Object.entries(groupedBySize).map(([size, items], index) => (
+              <Box key={size}>
+                <Typography variant="subtitle1" sx={{ px: 3, py: 1.5, fontWeight: "500" }}>
+                  Size: {size}
+                </Typography>
+                {items.map((item, subIndex) => (
+                  <Stack direction="row" key={subIndex} sx={{ px: 3, py: 1 }}>
+                    <Typography variant="body2" sx={{ width: 100, color: "#5f5f5f" }}>
+                      Màu sắc:
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: "500" }}>
+                      {item.color}
+                    </Typography>
+                  </Stack>
+                ))}
+                <Stack direction="row" sx={{ px: 3, py: 1, pb: 2 }}>
+                  <Typography variant="body2" sx={{ width: 100, color: "#5f5f5f" }}>
+                    Số lượng:
                   </Typography>
                   <TextField
-                    fullWidth
-                    multiline
-                    rows={2}
-                    placeholder="Chờ cập nhật"
-                    value={item.count}
-                    onChange={(e) => handleTextFieldChange(size, subIndex, e.target.value)}
+                    size="small"
+                    inputProps={{
+                      style: { 
+                        paddingTop: 4, 
+                        paddingBottom: 4,
+                      },
+                    }}
+                    sx={{ 
+                      width: 200, 
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#e0e0e0",
+                        },
+                      },
+                    }}
+                    value={items[0]?.count || ""}
+                    onChange={(e) => handleTextFieldChange(size, 0, e.target.value)}
                   />
                 </Stack>
-              ))}
-            </Box>
-          ))
-        ) : null}
+              </Box>
+            ))
+          ) : null}
+        </Box>
+        
+        <Box sx={{ p: 1, borderTop: "1px solid #e0e0e0", display: "flex", justifyContent: "center" }}>
+          <Button
+            variant="contained"
+            color="error"
+            sx={{ 
+              py: 1, 
+              width: 120, 
+              bgcolor: "#e4252a", 
+              textTransform: "none", 
+              fontSize: "16px",
+              "&:hover": { bgcolor: "#d01e23" },
+            }}
+            onClick={() => setModal(false)}
+          >
+            Đóng
+          </Button>
+        </Box>
       </Box>
-      <Stack
-        direction="row"
-        spacing={10}
-        style={{
-          justifyContent: "center",
-          textAlign: "center",
-          marginTop: 10,
-        }}
-      >
-        <Button
-          variant="contained"
-          color="error"
-          sx={{ width: 150 }}
-          onClick={() => setModal(false)}
-        >
-          Đóng
-        </Button>
-      </Stack>
-    </Box>
-  </Modal>
-);
+    </Modal>
+  );
 }
 
 export default ModalTk;

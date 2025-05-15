@@ -14,6 +14,7 @@ import {
   styled,
   Button,
   FormControl,
+  Chip,
 } from "@mui/material";
 import { curveCatmullRom, line } from "d3-shape";
 import { useState } from "react";
@@ -171,11 +172,11 @@ export const style = {
   transform: "translate(-50%, -50%)",
   width: 400,
   bgcolor: "background.default",
-  border: "2px solid gray",
-  boxShadow: 24,
+  border: "none",
+  boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
   color: "text.primary",
   p: 4,
-  borderRadius: 5,
+  borderRadius: 12,
 };
 
 export const styleProduct = {
@@ -185,11 +186,13 @@ export const styleProduct = {
   transform: "translate(-50%, -50%)",
   width: 800,
   bgcolor: "background.default",
-  border: "2px solid gray",
-  boxShadow: 24,
+  border: "none",
+  boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
   color: "text.primary",
   p: 4,
-  borderRadius: 10,
+  borderRadius: 12,
+  maxHeight: '90vh',
+  overflow: 'auto'
 };
 
 export const FormButton = styled(Button)(({ theme, color = "primary" }) => {
@@ -199,32 +202,26 @@ export const FormButton = styled(Button)(({ theme, color = "primary" }) => {
     success: 'linear-gradient(135deg, #4CAF50 0%, #388E3C 100%)',
     warning: 'linear-gradient(135deg, #FFA726 0%, #F57C00 100%)'
   };
-  
-  const hoverBgColors = {
-    primary: 'linear-gradient(135deg, #5ca1e1 0%, #2c6fbf 100%)',
-    error: 'linear-gradient(135deg, #e44d4d 0%, #c62828 100%)',
-    success: 'linear-gradient(135deg, #388E3C 0%, #2E7D32 100%)',
-    warning: 'linear-gradient(135deg, #F57C00 0%, #EF6C00 100%)'
-  };
-  
+
   return {
-    borderRadius: "8px",
-    padding: "10px 24px",
+    borderRadius: '10px',
+    padding: '10px 24px',
     fontWeight: 600,
-    textTransform: "none",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-    background: bgColors[color] || bgColors.primary,
-    color: "white",
-    minWidth: "120px",
-    transition: "all 0.3s ease",
-    "&:hover": {
-      background: hoverBgColors[color] || hoverBgColors.primary,
-      boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
-      transform: "translateY(-2px)"
+    letterSpacing: '0.5px',
+    textTransform: 'none',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+    background: bgColors[color],
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      boxShadow: '0 6px 15px rgba(0,0,0,0.15)',
+      transform: 'translateY(-2px)'
     },
-    "&:active": {
-      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-      transform: "translateY(0)"
+    '&:active': {
+      boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+      transform: 'translateY(1px)'
+    },
+    '&.Mui-disabled': {
+      background: 'linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%)',
     }
   };
 });
@@ -403,3 +400,192 @@ export const NoteDiv = styled("div")(() => ({
   display: "flex",
   justifyContent: "center",
 }));
+
+export const ModernCard = styled(Paper)(({ theme, elevation = 3 }) => ({
+  borderRadius: '16px',
+  overflow: 'hidden',
+  boxShadow: elevation > 0 ? `0 ${elevation * 2}px ${elevation * 5}px rgba(0,0,0,0.${elevation})` : 'none',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  '&:hover': {
+    boxShadow: elevation > 0 ? `0 ${elevation * 3}px ${elevation * 7}px rgba(0,0,0,0.${elevation + 1})` : 'none',
+    transform: 'translateY(-3px)'
+  }
+}));
+
+export const CardTitle = styled(Typography)(({ theme }) => ({
+  fontSize: '1.25rem',
+  fontWeight: 600,
+  color: '#1976d2',
+  borderBottom: '2px solid #e0e0e0',
+  paddingBottom: '10px',
+  marginBottom: '16px',
+}));
+
+export const TableContainer = styled(Paper)(({ theme }) => ({
+  borderRadius: '12px',
+  overflow: 'hidden',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+  transition: 'box-shadow 0.3s',
+  '& .MuiTable-root': {
+    borderCollapse: 'separate',
+    borderSpacing: 0
+  },
+  '& .MuiTableHead-root': {
+    '& .MuiTableRow-root': {
+      backgroundColor: '#e3f2fd',
+    },
+    '& .MuiTableCell-root': {
+      fontWeight: 'bold',
+      color: '#1976d2',
+      padding: '14px 16px'
+    }
+  },
+  '& .MuiTableBody-root': {
+    '& .MuiTableRow-root': {
+      '&:hover': {
+        backgroundColor: '#f5f5f5'
+      },
+      '&:nth-of-type(odd)': {
+        backgroundColor: '#fafafa'
+      }
+    },
+    '& .MuiTableCell-root': {
+      padding: '12px 16px',
+      borderBottom: '1px solid #eeeeee'
+    }
+  }
+}));
+
+export const ActionButton = styled(Button)(({ theme, size = 'medium', variant = 'contained', color = 'primary' }) => {
+  const getColor = () => {
+    switch (color) {
+      case 'primary': return { main: '#1976d2', hover: '#1565c0' };
+      case 'secondary': return { main: '#9c27b0', hover: '#7b1fa2' };
+      case 'success': return { main: '#2e7d32', hover: '#1b5e20' };
+      case 'error': return { main: '#d32f2f', hover: '#c62828' };
+      case 'warning': return { main: '#ed6c02', hover: '#e65100' };
+      case 'info': return { main: '#0288d1', hover: '#01579b' };
+      default: return { main: '#1976d2', hover: '#1565c0' };
+    }
+  };
+
+  const colors = getColor();
+
+  return {
+    borderRadius: size === 'small' ? '6px' : '8px',
+    textTransform: 'none',
+    fontWeight: 500,
+    letterSpacing: '0.3px',
+    boxShadow: variant === 'contained' ? '0 3px 8px rgba(0,0,0,0.12)' : 'none',
+    padding: size === 'small' ? '4px 10px' : '8px 16px',
+    ...(variant === 'contained' && {
+      backgroundColor: colors.main,
+      '&:hover': {
+        backgroundColor: colors.hover,
+        boxShadow: '0 5px 12px rgba(0,0,0,0.2)'
+      }
+    }),
+    ...(variant === 'outlined' && {
+      borderColor: colors.main,
+      color: colors.main,
+      '&:hover': {
+        borderColor: colors.hover,
+        backgroundColor: `${colors.main}10`
+      }
+    })
+  };
+});
+
+export const StyledChip = styled(({ color, ...rest }) => <Chip {...rest} />)(({ theme, color = 'default' }) => {
+  const getColor = () => {
+    switch (color) {
+      case 'success': return { bg: '#e6f4ea', text: '#2e7d32', border: '#a5d6a7' };
+      case 'error': return { bg: '#fdeded', text: '#d32f2f', border: '#ef9a9a' };
+      case 'warning': return { bg: '#fff4e5', text: '#ed6c02', border: '#ffcc80' };
+      case 'info': return { bg: '#e7f3fe', text: '#0288d1', border: '#90caf9' };
+      case 'primary': return { bg: '#e8f0fe', text: '#1976d2', border: '#90caf9' };
+      case 'default':
+      default: return { bg: '#f5f5f5', text: '#757575', border: '#e0e0e0' };
+    }
+  };
+
+  const colors = getColor();
+
+  return {
+    backgroundColor: colors.bg,
+    color: colors.text,
+    border: `1px solid ${colors.border}`,
+    fontWeight: 500,
+    '& .MuiChip-label': {
+      paddingLeft: 12,
+      paddingRight: 12
+    }
+  };
+});
+
+export const StyledSearchInput = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '8px',
+    backgroundColor: 'white',
+    transition: 'all 0.3s',
+    '&:hover': {
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+    },
+    '&.Mui-focused': {
+      boxShadow: '0 3px 10px rgba(0,0,0,0.12)'
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#ddd'
+    }
+  },
+  '& .MuiInputBase-input': {
+    padding: '12px 14px'
+  },
+  '& .MuiInputAdornment-root': {
+    marginRight: 8
+  }
+}));
+
+export const StyledSelect = styled(FormControl)(({ theme }) => ({
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '8px',
+    backgroundColor: 'white',
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#81C3FF'
+    },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#2c6fbf',
+    }
+  },
+  '& .MuiSelect-select': {
+    padding: '12px 14px'
+  }
+}));
+
+export const commonStyles = {
+  flexCenter: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  flexBetween: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  flexColumn: {
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  gradientBg: {
+    background: 'linear-gradient(135deg, #81C3FF 0%, #5ca1e1 100%)'
+  },
+  pageContainer: {
+    padding: '24px',
+    maxWidth: '1440px',
+    margin: '0 auto'
+  },
+  sectionContainer: {
+    marginBottom: '32px'
+  }
+};
