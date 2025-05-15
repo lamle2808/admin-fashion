@@ -272,6 +272,8 @@ export default function Table({ setSelect, select }) {
           ...selectedItem.specifications,
           id: matched.id,
           size: size,
+          color: selectedColor,
+          
         },
       });
     } else {

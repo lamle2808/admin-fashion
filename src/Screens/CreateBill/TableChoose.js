@@ -96,7 +96,7 @@ export default function TableChoose({ setSelect, select }) {
           <TableBody>
             {select.map((row) => (
               <TableRow
-                key={row.product.id + row.specifications}
+                key={row.product.id + row.specifications.color + row.specifications.size}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
