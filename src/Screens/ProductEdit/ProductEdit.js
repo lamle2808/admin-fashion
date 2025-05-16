@@ -271,7 +271,7 @@ function ProductEdit() {
     
     // Cập nhật sản phẩm lên server
     axios
-      .post("/api/v1/products/saveOrUpdate", {
+      .post("/api/v1/products/update", {
         id: id.id,
         productName: name,
         brand: {

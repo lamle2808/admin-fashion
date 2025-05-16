@@ -45,31 +45,107 @@ const ModalTk = ({ modal, setModal, id, spec, setSpec, category }) => {
   console.log(groupedBySize);
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const importOrderDetail = spec.map((item) => {
-      return {
-        specificationName: item.specificationName,
-        specificationValue: item.specificationValue,
-      };
+    if (e) e.preventDefault();
+    
+    // Chuyển đổi dữ liệu thành định dạng API cần
+    const specifications = [];
+    
+    // Thêm thông số về kích thước
+    const sizes = Object.keys(groupedBySize);
+    if (sizes.length > 0) {
+      specifications.push({
+        specificationName: "Kích thước",
+        specificationValue: sizes.join(", ")
+      });
+    }
+    
+    // Thêm thông số về màu sắc
+    const colors = new Set();
+    Object.values(groupedBySize).forEach(items => {
+      items.forEach(item => colors.add(item.color));
     });
-    console.log(importOrderDetail);
+    
+    if (colors.size > 0) {
+      specifications.push({
+        specificationName: "Màu sắc",
+        specificationValue: Array.from(colors).join(", ")
+      });
+    }
+    
+    // Thêm các thông số kỹ thuật khác từ spec gốc (nếu có)
+    spec.forEach(item => {
+      if (item.specificationName !== "Kích thước" && item.specificationName !== "Màu sắc") {
+        specifications.push({
+          specificationName: item.specificationName,
+          specificationValue: item.specificationValue
+        });
+      }
+    });
+    
+    // Cập nhật thông tin tồn kho cho từng màu sắc và kích thước
+    const variants = [];
+    Object.entries(groupedBySize).forEach(([size, items]) => {
+      items.forEach(item => {
+        variants.push({
+          size: size,
+          color: item.color,
+          count: item.count || 0
+        });
+      });
+    });
+    
+    console.log("Specifications:", specifications);
+    console.log("Variants:", variants);
+    
+    // Gửi cả hai bộ dữ liệu
+    const payload = {
+      specifications: specifications,
+      variants: variants
+    };
+    
     axios
-      .post(`/api/v1/productSpecifications/updateList/${id}`, importOrderDetail)
-      .then(function () {
+      .post(`/api/v1/products/updateSpecifications/${id}`, payload)
+      .then(function (response) {
+        console.log("Kết quả cập nhật:", response.data);
         setModal(false);
         Swal.fire({
           title: "Thành công",
+          text: "Đã cập nhật thông số kỹ thuật và số lượng",
           icon: "success",
         });
       })
       .catch(function (error) {
         console.log(error);
+        Swal.fire({
+          title: "Lỗi",
+          text: "Không thể cập nhật thông tin. Vui lòng thử lại sau.",
+          icon: "error",
+        });
       });
   };
-  const handleTextFieldChange = (index, value) => {
+  
+  // Cập nhật hàm để thay đổi số lượng cho từng màu riêng biệt
+  const handleCountChange = (sizeIndex, colorIndex, value) => {
     const updatedSpec = [...spec];
-    updatedSpec[index].specificationValue = value;
-    setSpec(updatedSpec);
+    // Tìm vị trí trong mảng spec ban đầu
+    let foundIndex = -1;
+    let currentSizeCount = 0;
+    let currentColorCount = 0;
+    
+    for (let i = 0; i < updatedSpec.length; i++) {
+      if (updatedSpec[i].size === Object.keys(groupedBySize)[sizeIndex]) {
+        currentSizeCount++;
+        if (currentSizeCount === colorIndex + 1) {
+          foundIndex = i;
+          break;
+        }
+      }
+    }
+    
+    if (foundIndex !== -1) {
+      updatedSpec[foundIndex].count = value;
+      setSpec(updatedSpec);
+    }
   };
 
   const toggleModal = () => {
@@ -87,51 +163,81 @@ const ModalTk = ({ modal, setModal, id, spec, setSpec, category }) => {
         
         <Box sx={{ maxHeight: 500, overflow: "auto" }}>
           {groupedBySize && typeof groupedBySize === "object" ? (
-            Object.entries(groupedBySize).map(([size, items], index) => (
-              <Box key={size}>
-                <Typography variant="subtitle1" sx={{ px: 3, py: 1.5, fontWeight: "500" }}>
-                  Size: {size}
-                </Typography>
-                {items.map((item, subIndex) => (
-                  <Stack direction="row" key={subIndex} sx={{ px: 3, py: 1 }}>
-                    <Typography variant="body2" sx={{ width: 100, color: "#5f5f5f" }}>
-                      Màu sắc:
-                    </Typography>
-                    <Typography variant="body2" sx={{ fontWeight: "500" }}>
-                      {item.color}
-                    </Typography>
-                  </Stack>
-                ))}
-                <Stack direction="row" sx={{ px: 3, py: 1, pb: 2 }}>
-                  <Typography variant="body2" sx={{ width: 100, color: "#5f5f5f" }}>
-                    Số lượng:
+            <>
+              {Object.entries(groupedBySize).map(([size, items], sizeIndex) => (
+                <Box key={size}>
+                  <Typography variant="subtitle1" sx={{ px: 3, py: 1.5, fontWeight: "500" }}>
+                    Size: {size}
                   </Typography>
-                  <TextField
-                    size="small"
-                    inputProps={{
-                      style: { 
-                        paddingTop: 4, 
-                        paddingBottom: 4,
-                      },
-                    }}
-                    sx={{ 
-                      width: 200, 
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": {
-                          borderColor: "#e0e0e0",
-                        },
-                      },
-                    }}
-                    value={items[0]?.count || ""}
-                    onChange={(e) => handleTextFieldChange(size, 0, e.target.value)}
-                  />
+                  {items.map((item, colorIndex) => (
+                    <Box key={colorIndex} sx={{ px: 3, py: 1, mb: 2 }}>
+                      <Stack direction="row" sx={{ mb: 1 }}>
+                        <Typography variant="body2" sx={{ width: 100, color: "#5f5f5f" }}>
+                          Màu sắc:
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: "500" }}>
+                          {item.color}
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row">
+                        <Typography variant="body2" sx={{ width: 100, color: "#5f5f5f" }}>
+                          Số lượng:
+                        </Typography>
+                        <TextField
+                          size="small"
+                          inputProps={{
+                            style: { 
+                              paddingTop: 4, 
+                              paddingBottom: 4,
+                            },
+                          }}
+                          sx={{ 
+                            width: 200, 
+                            "& .MuiOutlinedInput-root": {
+                              "& fieldset": {
+                                borderColor: "#e0e0e0",
+                              },
+                            },
+                          }}
+                          value={item.count || ""}
+                          onChange={(e) => handleCountChange(sizeIndex, colorIndex, e.target.value)}
+                        />
+                      </Stack>
+                    </Box>
+                  ))}
+                </Box>
+              ))}
+              
+              <Box sx={{ px: 3, py: 2, borderTop: "1px solid #e0e0e0", mt: 2 }}>
+                <Stack direction="row" sx={{ alignItems: "center" }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: "600", mr: 2 }}>
+                    Tổng số lượng:
+                  </Typography>
+                  <Typography variant="subtitle1" sx={{ fontWeight: "600", color: "#1976d2" }}>
+                    {Object.values(groupedBySize).flat().reduce((sum, item) => sum + (parseInt(item.count) || 0), 0)}
+                  </Typography>
                 </Stack>
               </Box>
-            ))
+            </>
           ) : null}
         </Box>
         
-        <Box sx={{ p: 1, borderTop: "1px solid #e0e0e0", display: "flex", justifyContent: "center" }}>
+        <Box sx={{ p: 1, borderTop: "1px solid #e0e0e0", display: "flex", justifyContent: "center", gap: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ 
+              py: 1, 
+              width: 120, 
+              bgcolor: "#2196f3", 
+              textTransform: "none", 
+              fontSize: "16px",
+              "&:hover": { bgcolor: "#1976d2" },
+            }}
+            onClick={handleSubmit}
+          >
+            Lưu
+          </Button>
           <Button
             variant="contained"
             color="error"

@@ -447,8 +447,20 @@ function DistributorModal({ open, onClose, onSave, initialData }) {
     e.preventDefault(); 
     setLoading(true);
     
-    axios.post('/api/v1/suppliers/saveOrUpdate', form)
-      .then(() => {
+    // Kiểm tra và làm sạch dữ liệu trước khi gửi
+    const supplierData = {
+      ...(form.id ? { id: form.id } : {}),
+      name: form.name.trim(),
+      address: form.address.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim()
+    };
+    
+    console.log("Dữ liệu gửi đi:", supplierData);
+    
+    axios.post('/api/v1/suppliers/saveOrUpdate', supplierData)
+      .then((response) => {
+        console.log("Kết quả:", response.data);
         Swal.fire({
           title: 'Thành công', 
           text: initialData ? 'Đã cập nhật nhà phân phối' : 'Đã thêm nhà phân phối mới', 
@@ -458,10 +470,22 @@ function DistributorModal({ open, onClose, onSave, initialData }) {
         onClose();
         onSave();
       })
-      .catch(() => {
+      .catch((error) => {
+        console.log("Lỗi:", error);
+        
+        let errorMessage = 'Không thể lưu thông tin nhà phân phối';
+        
+        if (error.response && error.response.data) {
+          console.log("Chi tiết lỗi:", error.response.data);
+          if (typeof error.response.data === 'string') {
+            // Hiển thị lỗi từ server nếu có
+            errorMessage = error.response.data;
+          }
+        }
+        
         Swal.fire({
           title: 'Lỗi', 
-          text: 'Không thể lưu thông tin nhà phân phối', 
+          text: errorMessage, 
           icon: 'error'
         });
       })

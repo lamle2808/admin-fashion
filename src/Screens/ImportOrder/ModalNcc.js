@@ -57,15 +57,20 @@ function ModalNcc({ modal, setModal, setNcc, setNccD }) {
 
     setLoading(true);
     
+    // Tạo đối tượng nhà cung cấp theo đúng định dạng entity Supplier
+    const supplierData = {
+      name: name.trim(),
+      address: address.trim(),
+      email: email.trim(),
+      phone: phone.trim()
+    };
+    
+    console.log("Dữ liệu gửi đi:", supplierData);
+    
     axios
-      .post("/api/v1/suppliers/saveOrUpdate", {
-        name,
-        address, 
-        email, 
-        phone
-      })
+      .post("/api/v1/suppliers/saveOrUpdate", supplierData)
       .then(function (response) {
-        console.log(response.data);
+        console.log("Kết quả:", response.data);
         
         // Cập nhật thông tin nhà cung cấp ở component cha
         if (setNccD && typeof setNccD === 'function') {
@@ -87,10 +92,20 @@ function ModalNcc({ modal, setModal, setNcc, setNccD }) {
         });
       })
       .catch(function (error) {
-        console.log(error);
+        console.log("Lỗi:", error);
+        
+        let errorMessage = "Không thể thêm nhà cung cấp. Vui lòng thử lại.";
+        
+        if (error.response && error.response.data) {
+          console.log("Chi tiết lỗi:", error.response.data);
+          if (typeof error.response.data === 'string') {
+            errorMessage = error.response.data;
+          }
+        }
+        
         Swal.fire({
           title: "Lỗi",
-          text: "Không thể thêm nhà cung cấp. Vui lòng thử lại.",
+          text: errorMessage,
           icon: "error",
         });
       })
