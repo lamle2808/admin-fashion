@@ -71,18 +71,6 @@ const CreateBill = () => {
       return;
     }
 
-    // Kiểm tra tính hợp lệ của dữ liệu sản phẩm
-    let hasInvalidProduct = false;
-    select.forEach((item) => {
-      if (!item.product || !item.product.id || !item.quantity) {
-        hasInvalidProduct = true;
-      }
-    });
-
-    if (hasInvalidProduct) {
-      Swal.fire("Lỗi", "Có sản phẩm không hợp lệ trong đơn hàng", "error");
-      return;
-    }
     console.log(select);
     setLoading(true);
     const orderData = {
@@ -94,39 +82,43 @@ const CreateBill = () => {
       statusPayment: 1,
       statusOrder: "3",
       employee: { id: id },
+
       orderDetails: select.map((item) => ({
-        quantity: item.quantity,
+        quantity: item.specifications.count,
         product: {
           id: item.product.id,
+        },
+        productSpecification: {
+          id: item.specifications.id,
         },
       })),
     };
 
     console.log("Dữ liệu gửi đi:", orderData);
-
-    // axios
-    //   .post(`/api/v1/orders/createNow`, orderData)
-    //   .then(function (response) {
-    //     setCustomer("");
-    //     setCustomerD("");
-    //     setSelect("");
-    //     setNote("");
-    //     setLoading(false);
-    //     Swal.fire({
-    //       title: "Thành công",
-    //       text: "Đã tạo hóa đơn thành công",
-    //       icon: "success",
-    //     });
-    //   })
-    //   .catch(function (error) {
-    //     setLoading(false);
-    //     console.error("Lỗi tạo hóa đơn:", error);
-    //     Swal.fire({
-    //       title: "Lỗi",
-    //       text: error.response?.data?.message || "Hết hàng trong lô",
-    //       icon: "error",
-    //     });
-    //   });
+    setLoading(false);
+    axios
+      .post(`/api/v1/orders/createNow`, orderData)
+      .then(function (response) {
+        setCustomer("");
+        setCustomerD("");
+        setSelect("");
+        setNote("");
+        setLoading(false);
+        Swal.fire({
+          title: "Thành công",
+          text: "Đã tạo hóa đơn thành công",
+          icon: "success",
+        });
+      })
+      .catch(function (error) {
+        setLoading(false);
+        console.error("Lỗi tạo hóa đơn:", error);
+        Swal.fire({
+          title: "Lỗi",
+          text: error.response?.data?.message || "Hết hàng trong lô",
+          icon: "error",
+        });
+      });
   };
 
   return (

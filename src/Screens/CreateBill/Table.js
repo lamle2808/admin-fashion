@@ -273,7 +273,6 @@ export default function Table({ setSelect, select }) {
           id: matched.id,
           size: size,
           color: selectedColor,
-          
         },
       });
     } else {
@@ -286,7 +285,6 @@ export default function Table({ setSelect, select }) {
         padding: 3,
         borderRadius: 3,
         backgroundColor: "#F8FAFC",
-        height: "85vh",
       }}
     >
       <Typography
